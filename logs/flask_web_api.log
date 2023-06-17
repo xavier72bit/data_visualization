@@ -1,0 +1,36 @@
+[2023-06-17 17:54:25,329] ERROR in app: Exception on /pymysql_test [GET]
+Traceback (most recent call last):
+  File "/Users/xavierwu/Desktop/Practice/Python/data_visualization/venv/lib/python3.11/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xavierwu/Desktop/Practice/Python/data_visualization/venv/lib/python3.11/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xavierwu/Desktop/Practice/Python/data_visualization/venv/lib/python3.11/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xavierwu/Desktop/Practice/Python/data_visualization/venv/lib/python3.11/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xavierwu/Desktop/Practice/Python/data_visualization/flask_web_app.py", line 64, in pymysql_test
+    connection1_cursor = connection1.get_curser()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'SteadyDBCursor' object is not callable
+[2023-06-17 17:56:40,356] ERROR in app: Exception on /pymysql_test [GET]
+Traceback (most recent call last):
+  File "/Users/xavierwu/Desktop/Practice/Python/data_visualization/venv/lib/python3.11/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xavierwu/Desktop/Practice/Python/data_visualization/venv/lib/python3.11/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xavierwu/Desktop/Practice/Python/data_visualization/venv/lib/python3.11/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xavierwu/Desktop/Practice/Python/data_visualization/venv/lib/python3.11/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xavierwu/Desktop/Practice/Python/data_visualization/flask_web_app.py", line 64, in pymysql_test
+    connection1_cursor = connection1.get_cursor()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'SteadyDBCursor' object is not callable

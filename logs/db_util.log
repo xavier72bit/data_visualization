@@ -1,0 +1,31 @@
+[2023-06-17 17:52:19,888] INFO in pymysql_toolkit: 数据库连接池配置：{'host': '192.168.64.16', 'db': 'data_visualization', 'user': 'data_visualization', 'password': '123456', 'port': 3306, 'charset': 'UTF8', 'min_cached': 10, 'max_cached': 20, 'max_shared': 10, 'max_connections': 100, 'blocking': True, 'max_usage': 100, 'set_session': None, 'reset': True}
+[2023-06-17 17:52:19,888] INFO in pymysql_toolkit: 开始初始化数据库连接池
+[2023-06-17 17:52:19,918] INFO in pymysql_toolkit: 数据库初始化成功
+[2023-06-17 17:54:25,323] DEBUG in pymysql_toolkit: 从连接池获取连接
+[2023-06-17 17:54:25,326] INFO in pymysql_toolkit: MySQL连接开启，当前连接<dbutils.pooled_db.PooledDedicatedDBConnection object at 0x106a46fd0>
+[2023-06-17 17:54:25,326] INFO in pymysql_toolkit: MySQL光标获取成功，当前光标<dbutils.steady_db.SteadyDBCursor object at 0x106a46dd0>
+[2023-06-17 17:54:25,327] INFO in pymysql_toolkit: 光标：<dbutils.steady_db.SteadyDBCursor object at 0x106a46dd0>，已关闭
+[2023-06-17 17:54:25,329] INFO in pymysql_toolkit: 连接：<dbutils.pooled_db.PooledDedicatedDBConnection object at 0x106a46fd0>，已关闭
+[2023-06-17 17:56:35,160] INFO in pymysql_toolkit: 数据库连接池配置：{'host': '192.168.64.16', 'db': 'data_visualization', 'user': 'data_visualization', 'password': '123456', 'port': 3306, 'charset': 'UTF8', 'min_cached': 10, 'max_cached': 20, 'max_shared': 10, 'max_connections': 100, 'blocking': True, 'max_usage': 100, 'set_session': None, 'reset': True}
+[2023-06-17 17:56:35,160] INFO in pymysql_toolkit: 开始初始化数据库连接池
+[2023-06-17 17:56:35,193] INFO in pymysql_toolkit: 数据库初始化成功
+[2023-06-17 17:56:40,352] DEBUG in pymysql_toolkit: 从连接池获取连接
+[2023-06-17 17:56:40,353] INFO in pymysql_toolkit: MySQL连接开启，当前连接<dbutils.pooled_db.PooledDedicatedDBConnection object at 0x102639150>
+[2023-06-17 17:56:40,354] INFO in pymysql_toolkit: MySQL光标获取成功，当前光标<dbutils.steady_db.SteadyDBCursor object at 0x102639290>
+[2023-06-17 17:56:40,354] INFO in pymysql_toolkit: 光标：<dbutils.steady_db.SteadyDBCursor object at 0x102639290>，已关闭
+[2023-06-17 17:56:40,356] INFO in pymysql_toolkit: 连接：<dbutils.pooled_db.PooledDedicatedDBConnection object at 0x102639150>，已关闭
+[2023-06-17 17:57:56,433] INFO in pymysql_toolkit: 数据库连接池配置：{'host': '192.168.64.16', 'db': 'data_visualization', 'user': 'data_visualization', 'password': '123456', 'port': 3306, 'charset': 'UTF8', 'min_cached': 10, 'max_cached': 20, 'max_shared': 10, 'max_connections': 100, 'blocking': True, 'max_usage': 100, 'set_session': None, 'reset': True}
+[2023-06-17 17:57:56,433] INFO in pymysql_toolkit: 开始初始化数据库连接池
+[2023-06-17 17:57:56,465] INFO in pymysql_toolkit: 数据库初始化成功
+[2023-06-17 17:58:00,583] DEBUG in pymysql_toolkit: 从连接池获取连接
+[2023-06-17 17:58:00,584] INFO in pymysql_toolkit: MySQL连接开启，当前连接<dbutils.pooled_db.PooledDedicatedDBConnection object at 0x102e46010>
+[2023-06-17 17:58:00,584] INFO in pymysql_toolkit: MySQL光标获取成功，当前光标<dbutils.steady_db.SteadyDBCursor object at 0x102e45050>
+[2023-06-17 17:58:00,584] INFO in pymysql_toolkit: 光标：<dbutils.steady_db.SteadyDBCursor object at 0x102e45050>，已关闭
+[2023-06-17 17:58:00,586] INFO in pymysql_toolkit: 连接：<dbutils.pooled_db.PooledDedicatedDBConnection object at 0x102e46010>，已关闭
+[2023-06-17 17:58:00,586] DEBUG in pymysql_toolkit: 从连接池获取连接
+[2023-06-17 17:58:00,587] INFO in pymysql_toolkit: MySQL连接开启，当前连接<dbutils.pooled_db.PooledDedicatedDBConnection object at 0x102e45010>
+[2023-06-17 17:58:00,587] INFO in pymysql_toolkit: MySQL光标获取成功，当前光标<dbutils.steady_db.SteadyDBCursor object at 0x102e451d0>
+[2023-06-17 17:58:00,587] INFO in pymysql_toolkit: 开启事务
+[2023-06-17 17:58:00,588] INFO in pymysql_toolkit: 事务已提交
+[2023-06-17 17:58:00,588] INFO in pymysql_toolkit: 光标：<dbutils.steady_db.SteadyDBCursor object at 0x102e451d0>，已关闭
+[2023-06-17 17:58:00,589] INFO in pymysql_toolkit: 连接：<dbutils.pooled_db.PooledDedicatedDBConnection object at 0x102e45010>，已关闭

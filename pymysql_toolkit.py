@@ -45,7 +45,7 @@ else:
 
 
 # -----------------------------------------------------
-# MySQL数据库连接 工具类
+# MySQL数据库连接
 # -----------------------------------------------------
 
 class MysqlConnection:
@@ -108,9 +108,9 @@ class MysqlConnection:
 
 
 # -----------------------------------------------------
-# Domain 数据对象 工具类
+# Domain 数据对象
 # -----------------------------------------------------
-
+# TODO: 加上注释
 class AccessLog:
     __slots__ = ['access_log_id', 'access_date_time', 'access_token',
                  'access_state', 'delete_flag', 'access_log_message']
@@ -159,11 +159,82 @@ class PlotTask:
 
 
 # -----------------------------------------------------
-# Dao 层 工具类
+# Dao 数据库表操作
 # -----------------------------------------------------
-
+# TODO: 可以考虑使用工厂函数去制造不同的Dao类
 class AccessLogDao:
-    pass
+    def __init__(self, cursor):
+        self._execute_cursor = cursor
+
+    def insert_exc(self, access_log: AccessLog):
+        insert_sql = 'INSERT INTO access_log (access_log_id, access_date_time, access_token, access_state, delete_flag, access_log_message) VALUES (%s, %s, %s, %s, %s, %s)'
+        params = (access_log.access_log_id, access_log.access_date_time, access_log.access_token,
+                  access_log.access_state, access_log.delete_flag, access_log.access_log_message)
+
+        return self._execute_cursor.execute(insert_sql, params)
+
+    def delete_exc(self, access_log: AccessLog):
+        delete_sql = 'DELETE FROM access_log WHERE access_log_id = %s'
+        params = (access_log.access_log_id,)
+
+        return self._execute_cursor.execute(delete_sql, params)
+
+    def update_exc(self, access_log: AccessLog):
+        update_sql = 'UPDATE access_log SET access_date_time = %s, access_token = %s, access_state = %s, delete_flag = %s, access_log_message = %s WHERE access_log_id = %s'
+        params = (access_log.access_date_time, access_log.access_token, access_log.access_state,
+                  access_log.delete_flag, access_log.access_log_message, access_log.access_log_id)
+
+        return self._execute_cursor.execute(update_sql, params)
+
+    def select_one_exc_by_id(self, access_log: AccessLog):
+        select_one_by_id_sql = 'SELECT access_log_id, access_date_time, access_token, access_state, delete_flag, access_log_message FROM access_log WHERE access_log_id = %s LIMIT 0, 1'
+        params = (access_log.access_log_id,)
+
+        exc_result = self._execute_cursor.execute(select_one_by_id_sql, params)
+        # TODO: 换成日志
+        print(exc_result)
+
+        try:
+            select_result = self._execute_cursor.fetchone()
+            access_log_result = AccessLog(select_result['access_log_id'],
+                                          select_result['access_date_time'],
+                                          select_result['access_token'],
+                                          select_result['access_state'],
+                                          select_result['delete_flag'],
+                                          select_result['access_log_message'])
+        except Exception as select_exc_err:
+            # TODO: 换成日志
+            print(select_exc_err)
+            return None
+        else:
+            return access_log_result
+
+    def select_list_exc_by_access_token(self, access_log: AccessLog):
+        select_list_by_access_token_sql = 'SELECT access_log_id, access_date_time, access_token, access_state, delete_flag, access_log_message FROM access_log WHERE access_token LIKE %s'
+        params = (access_log.access_token,)
+
+        exc_result = self._execute_cursor.execute(select_list_by_access_token_sql, params)
+        # TODO: 换成日志
+        print(exc_result)
+        # TODO: 注意这里，如果有问题换成元组
+        access_log_result_list = []
+
+        try:
+            for select_result in self._execute_cursor:
+                access_log_result = AccessLog(select_result['access_log_id'],
+                                              select_result['access_date_time'],
+                                              select_result['access_token'],
+                                              select_result['access_state'],
+                                              select_result['delete_flag'],
+                                              select_result['access_log_message'])
+
+                access_log_result_list.append(access_log_result)
+        except Exception as select_exc_err:
+            # TODO: 换成日志
+            print(select_exc_err)
+            return None
+        else:
+            return access_log_result_list
 
 
 class PlotResultDao:
@@ -175,7 +246,7 @@ class PlotTaskDao:
 
 
 # -----------------------------------------------------
-# Service 层 工具类
+# Service 业务
 # -----------------------------------------------------
 
 class AccessLogService:

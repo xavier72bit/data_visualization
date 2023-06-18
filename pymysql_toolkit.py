@@ -112,15 +112,50 @@ class MysqlConnection:
 # -----------------------------------------------------
 
 class AccessLog:
-    pass
+    __slots__ = ['access_log_id', 'access_date_time', 'access_token',
+                 'access_state', 'delete_flag', 'access_log_message']
+
+    def __init__(self, access_log_id, access_date_time, access_token,
+                 access_state, delete_flag, access_log_message):
+        self.access_log_id = access_log_id
+        self.access_date_time = access_date_time
+        self.access_token = access_token
+        self.access_state = access_state
+        self.delete_flag = delete_flag
+        self.access_log_message = access_log_message
 
 
 class PlotResult:
-    pass
+    __slots__ = ['plot_result_id', 'plot_task_id', 'plot_result_finish_date_time',
+                 'plot_result_finish_state', 'plot_result_local_path', 'plot_result_upload_date_time',
+                 'plot_result_upload_state', 'plot_result_url', 'delete_flag']
+
+    def __init__(self, plot_result_id, plot_task_id, plot_result_finish_date_time,
+                 plot_result_finish_state, plot_result_local_path, plot_result_upload_date_time,
+                 plot_result_upload_state, plot_result_url, delete_flag):
+        self.plot_result_id = plot_result_id
+        self.plot_task_id = plot_task_id
+        self.plot_result_finish_date_time = plot_result_finish_date_time
+        self.plot_result_finish_state = plot_result_finish_state
+        self.plot_result_local_path = plot_result_local_path
+        self.plot_result_upload_date_time = plot_result_upload_date_time
+        self.plot_result_upload_state = plot_result_upload_state
+        self.plot_result_url = plot_result_url
+        self.delete_flag = delete_flag
 
 
 class PlotTask:
-    pass
+    __slots__ = ['plot_task_id', 'plot_task_create_date_time', 'plot_task_finish_date_time',
+                 'plot_task_state', 'access_log_id', 'delete_flag']
+
+    def __init__(self, plot_task_id, plot_task_create_date_time, plot_task_finish_date_time,
+                 plot_task_state, access_log_id, delete_flag):
+        self.plot_task_id = plot_task_id
+        self.plot_task_create_date_time = plot_task_create_date_time
+        self.plot_task_finish_date_time = plot_task_finish_date_time
+        self.plot_task_state = plot_task_state
+        self.access_log_id = access_log_id
+        self.delete_flag = delete_flag
 
 
 # -----------------------------------------------------

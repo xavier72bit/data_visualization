@@ -161,6 +161,7 @@ class PlotTask:
 # -----------------------------------------------------
 # Dao 数据库表操作
 # -----------------------------------------------------
+
 # TODO: 可以考虑使用工厂函数去制造不同的Dao类
 class AccessLogDao:
     def __init__(self, cursor):
@@ -258,11 +259,9 @@ class PlotResultDao:
 
     def update_exc(self, plot_result: PlotResult):
         update_sql = 'UPDATE plot_result SET plot_task_id = %s, plot_result_finish_date_time = %s, plot_result_finish_state = %s, plot_result_local_path = %s, plot_result_upload_date_time = %s, plot_result_upload_state = %s, plot_result_url = %s, delete_flag = %s WHERE plot_result_id = %s'
-        params = (
-        plot_result.plot_task_id, plot_result.plot_result_finish_date_time, plot_result.plot_result_finish_state,
-        plot_result.plot_result_local_path, plot_result.plot_result_upload_date_time,
-        plot_result.plot_result_upload_state,
-        plot_result.plot_result_url, plot_result.delete_flag, plot_result.plot_result_id)
+        params = (plot_result.plot_task_id, plot_result.plot_result_finish_date_time, plot_result.plot_result_finish_state,
+                  plot_result.plot_result_local_path, plot_result.plot_result_upload_date_time, plot_result.plot_result_upload_state,
+                  plot_result.plot_result_url, plot_result.delete_flag, plot_result.plot_result_id, plot_result.plot_task_id)
 
         return self._execute_cursor.execute(update_sql, params)
 
@@ -325,7 +324,80 @@ class PlotResultDao:
 
 
 class PlotTaskDao:
-    pass
+    def __init__(self, cursor):
+        self._execute_cursor = cursor
+
+    def insert_exc(self, plot_task: PlotTask):
+        insert_sql = 'INSERT INTO plot_task (plot_task_id, plot_task_create_date_time, plot_task_finish_date_time, plot_task_state, access_log_id, delete_flag) VALUES (%s, %s, %s, %s, %s, %s)'
+        params = (plot_task.plot_task_id, plot_task.plot_task_create_date_time, plot_task.plot_task_finish_date_time,
+                  plot_task.plot_task_state, plot_task.access_log_id, plot_task.delete_flag)
+
+        return self._execute_cursor(insert_sql, params)
+
+    def delete_exc(self, plot_task: PlotTask):
+        delete_sql = 'DELETE FROM plot_task WHERE plot_task_id = %s'
+        params = (plot_task.plot_task_id,)
+
+        return self._execute_cursor.execute(delete_sql, params)
+
+    def update_exc(self, plot_task: PlotTask):
+        update_sql = 'UPDATE plot_task SET plot_task_id = %s, plot_task_create_date_time = %s, plot_task_finish_date_time = %s, plot_task_state = %s, access_log_id = %s, delete_flag = %s WHERE plot_task_id = %s'
+        params = (plot_task.plot_task_id, plot_task.plot_task_create_date_time, plot_task.plot_task_finish_date_time,
+                  plot_task.plot_task_state, plot_task.access_log_id, plot_task.delete_flag, plot_task.plot_task_id)
+
+        return self._execute_cursor.execute(update_sql, params)
+
+    def select_one_exc_by_id(self, plot_task: PlotTask):
+        select_one_by_id_sql = 'SELECT plot_task_id, plot_task_create_date_time, plot_task_finish_date_time, plot_task_state, access_log_id, delete_flag FROM plot_task WHERE plot_task_id = %s LIMIT 0, 1'
+        params = (plot_task.plot_task_id,)
+
+        exc_result = self._execute_cursor(select_one_by_id_sql, params)
+
+        # TODO: 换成日志
+        print(exc_result)
+
+        try:
+            select_result = self._execute_cursor.fetchone()
+            plot_task_result = PlotTask(select_result['plot_task_id'],
+                                        select_result['plot_task_create_date_time'],
+                                        select_result['plot_task_finish_date_time'],
+                                        select_result['plot_task_state'],
+                                        select_result['access_log_id'],
+                                        select_result['delete_flag'])
+        except Exception as select_exc_err:
+            # TODO: 换成日志
+            print(select_exc_err)
+            return None
+        else:
+            return plot_task_result
+
+    def select_list_exc_by_access_log_id(self, plot_task: PlotTask):
+        select_list_by_access_log_id_sql = 'SELECT plot_task_id, plot_task_create_date_time, plot_task_finish_date_time, plot_task_state, access_log_id, delete_flag FROM plot_task WHERE access_log_id LIKE %s'
+        params = (plot_task.access_log_id,)
+
+        exc_result = self._execute_cursor.execute(select_list_by_access_log_id_sql, params)
+
+        # TODO: 换成日志
+        print(exc_result)
+        # TODO: 注意这里，如果有问题换成元组
+        plot_task_result_list = []
+
+        try:
+            for select_result in self._execute_cursor:
+                plot_task_result = PlotTask(select_result['plot_task_id'],
+                                            select_result['plot_task_create_date_time'],
+                                            select_result['plot_task_finish_date_time'],
+                                            select_result['plot_task_state'],
+                                            select_result['access_log_id'],
+                                            select_result['delete_flag'])
+
+                plot_task_result_list.append(plot_task_result)
+        except Exception as select_exc_err:
+            # TODO: 换成日志
+            print(select_exc_err)
+            return None
+        else:
+            return plot_task_result_list
 
 
 # -----------------------------------------------------

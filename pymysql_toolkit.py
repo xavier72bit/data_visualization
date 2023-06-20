@@ -3,7 +3,10 @@ import config_util
 import logging_util
 from dbutils.pooled_db import PooledDB
 
-__all__ = ["MysqlConnection"]
+__all__ = ["MysqlConnection",
+           "AccessLog", "PlotResult", "PlotTask",
+           "AccessLogDao", "PlotResultDao", "PlotTaskDao",
+           "AccessLogService", "PlotResultService", "PlotTaskService"]
 
 # -----------------------------------------------------
 # 模块初始化

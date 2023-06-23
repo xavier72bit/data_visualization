@@ -204,5 +204,92 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         self.assertIsNone(result)
 
 
+class PlotTaskDaoBaseTest(unittest.TestCase):
+    """
+    对PlotTaskDao的基本测试
+    """
+    def test_single_insert_and_single_select(self):
+        plot_task = PlotTask(plot_task_id="9DA61402-A1CB-7041-A629-6191494C5767",
+                             plot_task_create_date_time=date_time_now,
+                             plot_task_finish_date_time=date_time_now,
+                             plot_task_state=0,
+                             access_log_id="9DA61402-A1CB-7041-A629-6191494C5767",
+                             delete_flag=0)
+
+        with MysqlConnection() as connection:
+            cursor = connection.get_cursor()
+            plot_task_dao = PlotTaskDao(cursor)
+            plot_task_dao.insert_exc(plot_task)
+
+        with MysqlConnection() as connection:
+            cursor = connection.get_cursor()
+            plot_task_dao = PlotTaskDao(cursor)
+            new_plot_task = plot_task_dao.select_one_exc_by_id(plot_task)
+
+        self.assertEqual(plot_task.plot_task_id, new_plot_task.plot_task_id)
+        self.assertEqual(plot_task.plot_task_create_date_time,
+                         new_plot_task.plot_task_create_date_time.strftime("%Y-%m-%d %H:%M:%S"))
+        self.assertEqual(plot_task.plot_task_finish_date_time,
+                         new_plot_task.plot_task_finish_date_time.strftime("%Y-%m-%d %H:%M:%S"))
+        self.assertEqual(plot_task.plot_task_state, new_plot_task.plot_task_state)
+        self.assertEqual(plot_task.access_log_id, new_plot_task.access_log_id)
+        self.assertEqual(plot_task.delete_flag, new_plot_task.delete_flag)
+
+    def test_multi_insert(self):
+        with MysqlConnection(transaction=True) as connection:
+            cursor = connection.get_cursor()
+            plot_task_dao = PlotTaskDao(cursor)
+            effect_row = 0
+
+        for uuid in uuid_list:
+            plot_task = PlotTask(plot_task_id=uuid,
+                                 plot_task_create_date_time=date_time_now,
+                                 plot_task_finish_date_time=date_time_now,
+                                 plot_task_state=1,
+                                 access_log_id="9DA61402-A1CB-7041-A629-6191494C5767",
+                                 delete_flag=0)
+
+            exc_result = plot_task_dao.insert_exc(plot_task)
+
+            effect_row += exc_result
+
+        self.assertEqual(effect_row, 10)
+
+    def test_multi_select(self):
+        access_log_id = "9DA61402-A1CB-7041-A629-6191494C5767"
+        plot_task = PlotTask(access_log_id=access_log_id)
+
+        with MysqlConnection() as connection:
+            cursor = connection.get_cursor()
+            plot_task_dao = PlotTaskDao(cursor)
+
+            result_list = plot_task_dao.select_list_exc_by_access_log_id(plot_task)
+
+        print(result_list)
+
+        for result in result_list:
+            print(result.plot_task_id, end=',')
+
+        self.assertEqual(len(result_list), 11)
+
+    def test_delete(self):
+        plot_task_id = '9DA61402-A1CB-7041-A629-6191494C57D1'
+        plot_task = PlotTask(plot_task_id=plot_task_id)
+
+        with MysqlConnection() as connection:
+            cursor = connection.get_cursor()
+            plot_task_dao = PlotTaskDao(cursor)
+
+            plot_task_dao.delete_exc(plot_task)
+
+        with MysqlConnection() as connection:
+            cursor = connection.get_cursor()
+            plot_task_dao = PlotTaskDao(cursor)
+
+            result = plot_task_dao.select_one_exc_by_id(plot_task)
+
+        self.assertIsNone(result)
+
+
 if __name__ == '__main__':
     unittest.main()

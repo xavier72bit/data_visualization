@@ -5,8 +5,7 @@ from dbutils.pooled_db import PooledDB
 
 __all__ = ["MysqlConnection",
            "AccessLog", "PlotResult", "PlotTask",
-           "AccessLogDao", "PlotResultDao", "PlotTaskDao",
-           "AccessLogService", "PlotResultService", "PlotTaskService"]
+           "AccessLogDao", "PlotResultDao", "PlotTaskDao"]
 
 # -----------------------------------------------------
 # 模块初始化
@@ -113,8 +112,12 @@ class MysqlConnection:
 # -----------------------------------------------------
 # Domain 数据对象
 # -----------------------------------------------------
-# TODO: 加上注释
+
+
 class AccessLog:
+    """
+    access_log表的数据对象
+    """
     __slots__ = ['access_log_id', 'access_date_time', 'access_token',
                  'access_state', 'delete_flag', 'access_log_message']
 
@@ -129,6 +132,9 @@ class AccessLog:
 
 
 class PlotResult:
+    """
+    plot_result表的数据对象
+    """
     __slots__ = ['plot_result_id', 'plot_task_id', 'plot_result_finish_date_time',
                  'plot_result_finish_state', 'plot_result_local_path', 'plot_result_upload_date_time',
                  'plot_result_upload_state', 'plot_result_url', 'delete_flag']
@@ -148,6 +154,9 @@ class PlotResult:
 
 
 class PlotTask:
+    """
+    plot_task表的数据对象
+    """
     __slots__ = ['plot_task_id', 'plot_task_create_date_time', 'plot_task_finish_date_time',
                  'plot_task_state', 'access_log_id', 'delete_flag']
 
@@ -165,8 +174,11 @@ class PlotTask:
 # Dao 数据库表操作
 # -----------------------------------------------------
 
-# TODO: 可以考虑使用工厂函数去制造不同的Dao类
+
 class AccessLogDao:
+    """
+    access_log表的操作
+    """
     def __init__(self, cursor):
         self._execute_cursor = cursor
 
@@ -195,8 +207,7 @@ class AccessLogDao:
         params = (access_log.access_log_id,)
 
         exc_result = self._execute_cursor.execute(select_one_by_id_sql, params)
-        # TODO: 换成日志
-        print(exc_result)
+        db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
 
         try:
             select_result = self._execute_cursor.fetchone()
@@ -207,8 +218,7 @@ class AccessLogDao:
                                           select_result['delete_flag'],
                                           select_result['access_log_message'])
         except Exception as select_exc_err:
-            # TODO: 换成日志
-            print(select_exc_err)
+            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
             return None
         else:
             return access_log_result
@@ -218,12 +228,12 @@ class AccessLogDao:
         params = (access_log.access_token,)
 
         exc_result = self._execute_cursor.execute(select_list_by_access_token_sql, params)
-        # TODO: 换成日志
-        print(exc_result)
-        # TODO: 注意这里，如果有问题换成元组
+        db_util_logger.info("select_list_exc_by_access_token查询到{0}条结果".format(exc_result))
+
         access_log_result_list = []
 
         try:
+            # 遍历查询到的所有row
             for select_result in self._execute_cursor:
                 access_log_result = AccessLog(select_result['access_log_id'],
                                               select_result['access_date_time'],
@@ -234,14 +244,16 @@ class AccessLogDao:
 
                 access_log_result_list.append(access_log_result)
         except Exception as select_exc_err:
-            # TODO: 换成日志
-            print(select_exc_err)
+            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
             return None
         else:
             return access_log_result_list
 
 
 class PlotResultDao:
+    """
+    plot_result表的操作
+    """
     def __init__(self, cursor):
         self._execute_cursor = cursor
 
@@ -274,8 +286,7 @@ class PlotResultDao:
 
         exc_result = self._execute_cursor.execute(select_one_by_id_sql, params)
 
-        # TODO: 换成日志
-        print(exc_result)
+        db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
 
         try:
             select_result = self._execute_cursor.fetchone()
@@ -289,8 +300,7 @@ class PlotResultDao:
                                             select_result['plot_result_url'],
                                             select_result['delete_flag'])
         except Exception as select_exc_err:
-            # TODO: 换成日志
-            print(select_exc_err)
+            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
             return None
         else:
             return plot_result_result
@@ -300,9 +310,8 @@ class PlotResultDao:
         params = (plot_result.plot_task_id,)
 
         exc_result = self._execute_cursor.execute(select_list_by_plot_task_id_sql, params)
-        # TODO: 换成日志
-        print(exc_result)
-        # TODO: 注意这里，如果有问题换成元组
+        db_util_logger.info("select_list_exc_by_plot_task_id查询到{0}条结果".format(exc_result))
+
         plot_result_result_list = []
 
         try:
@@ -319,14 +328,16 @@ class PlotResultDao:
 
                 plot_result_result_list.append(plot_result_result)
         except Exception as select_exc_err:
-            # TODO: 换成日志
-            print(select_exc_err)
+            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
             return None
         else:
             return plot_result_result_list
 
 
 class PlotTaskDao:
+    """
+    plot_task表的操作
+    """
     def __init__(self, cursor):
         self._execute_cursor = cursor
 
@@ -355,9 +366,7 @@ class PlotTaskDao:
         params = (plot_task.plot_task_id,)
 
         exc_result = self._execute_cursor(select_one_by_id_sql, params)
-
-        # TODO: 换成日志
-        print(exc_result)
+        db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
 
         try:
             select_result = self._execute_cursor.fetchone()
@@ -368,8 +377,7 @@ class PlotTaskDao:
                                         select_result['access_log_id'],
                                         select_result['delete_flag'])
         except Exception as select_exc_err:
-            # TODO: 换成日志
-            print(select_exc_err)
+            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
             return None
         else:
             return plot_task_result
@@ -379,10 +387,8 @@ class PlotTaskDao:
         params = (plot_task.access_log_id,)
 
         exc_result = self._execute_cursor.execute(select_list_by_access_log_id_sql, params)
+        db_util_logger.info("select_list_exc_by_access_log_id查询到{0}条结果".format(exc_result))
 
-        # TODO: 换成日志
-        print(exc_result)
-        # TODO: 注意这里，如果有问题换成元组
         plot_task_result_list = []
 
         try:
@@ -396,24 +402,7 @@ class PlotTaskDao:
 
                 plot_task_result_list.append(plot_task_result)
         except Exception as select_exc_err:
-            # TODO: 换成日志
-            print(select_exc_err)
+            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
             return None
         else:
             return plot_task_result_list
-
-
-# -----------------------------------------------------
-# Service 业务
-# -----------------------------------------------------
-
-class AccessLogService:
-    pass
-
-
-class PlotResultService:
-    pass
-
-
-class PlotTaskService:
-    pass

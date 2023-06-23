@@ -121,8 +121,8 @@ class AccessLog:
     __slots__ = ['access_log_id', 'access_date_time', 'access_token',
                  'access_state', 'delete_flag', 'access_log_message']
 
-    def __init__(self, access_log_id, access_date_time, access_token,
-                 access_state, delete_flag, access_log_message):
+    def __init__(self, access_log_id=None, access_date_time=None, access_token=None,
+                 access_state=None, delete_flag=None, access_log_message=None):
         self.access_log_id = access_log_id
         self.access_date_time = access_date_time
         self.access_token = access_token
@@ -139,9 +139,9 @@ class PlotResult:
                  'plot_result_finish_state', 'plot_result_local_path', 'plot_result_upload_date_time',
                  'plot_result_upload_state', 'plot_result_url', 'delete_flag']
 
-    def __init__(self, plot_result_id, plot_task_id, plot_result_finish_date_time,
-                 plot_result_finish_state, plot_result_local_path, plot_result_upload_date_time,
-                 plot_result_upload_state, plot_result_url, delete_flag):
+    def __init__(self, plot_result_id=None, plot_task_id=None, plot_result_finish_date_time=None,
+                 plot_result_finish_state=None, plot_result_local_path=None, plot_result_upload_date_time=None,
+                 plot_result_upload_state=None, plot_result_url=None, delete_flag=None):
         self.plot_result_id = plot_result_id
         self.plot_task_id = plot_task_id
         self.plot_result_finish_date_time = plot_result_finish_date_time
@@ -160,8 +160,8 @@ class PlotTask:
     __slots__ = ['plot_task_id', 'plot_task_create_date_time', 'plot_task_finish_date_time',
                  'plot_task_state', 'access_log_id', 'delete_flag']
 
-    def __init__(self, plot_task_id, plot_task_create_date_time, plot_task_finish_date_time,
-                 plot_task_state, access_log_id, delete_flag):
+    def __init__(self, plot_task_id=None, plot_task_create_date_time=None, plot_task_finish_date_time=None,
+                 plot_task_state=None, access_log_id=None, delete_flag=None):
         self.plot_task_id = plot_task_id
         self.plot_task_create_date_time = plot_task_create_date_time
         self.plot_task_finish_date_time = plot_task_finish_date_time
@@ -178,6 +178,8 @@ class PlotTask:
 class AccessLogDao:
     """
     access_log表的操作
+
+    #TODO: 差一个查询所有access_token
     """
     def __init__(self, cursor):
         self._execute_cursor = cursor

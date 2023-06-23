@@ -12,23 +12,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
     测试用例简述：
     1. 单条插入
     2. 多条插入（开启事务）
-    4. 单条查询
-    5. 多条查询
-    6. 单条更新
-    7. 多条更新（开启事务）
-    8. 单条删除
-    9. 多条删除（开启事务）
     """
-
-    def setUp(self) -> None:
-        """
-        开始测试之前，先清空数据库
-        :return:
-        """
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            cursor.execute('TRUNCATE access_log;')
-            print("清空数据库")
 
     def test_single_insert_and_single_select(self):
         # 手动新建一个AccessLog对象
@@ -52,6 +36,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
             access_log_dao = AccessLogDao(cursor)
             new_access_log = access_log_dao.select_one_exc_by_id(access_log)
 
+        print(new_access_log)
         self.assertEqual(access_log.access_log_id, new_access_log.access_log_id)
         self.assertEqual(access_log.access_date_time, new_access_log.access_date_time.strftime("%Y-%m-%d %H:%M:%S"))
         self.assertEqual(access_log.access_token, new_access_log.access_token)
@@ -89,6 +74,41 @@ class AccessLogDaoBaseTest(unittest.TestCase):
                 effect_row += exc_result
 
             self.assertEqual(effect_row, 10)
+
+    def test_multi_select(self):
+        access_token = "test_token_test_token"
+
+        access_log = AccessLog(access_token=access_token)
+        with MysqlConnection() as connection:
+            cursor = connection.get_cursor()
+            access_log_dao = AccessLogDao(cursor)
+
+            result_list = access_log_dao.select_list_exc_by_access_token(access_log)
+
+        print(result_list)
+
+        for result in result_list:
+            print(result.access_log_id, end=',')
+
+        self.assertEqual(len(result_list), 11)
+
+    def test_delete(self):
+        access_log_id = '9DA61402-A1CB-7041-A629-6191494C57D1'
+        access_log = AccessLog(access_log_id=access_log_id)
+
+        with MysqlConnection() as connection:
+            cursor = connection.get_cursor()
+            access_log_dao = AccessLogDao(cursor)
+
+            access_log_dao.delete_exc(access_log)
+
+        with MysqlConnection() as connection:
+            cursor = connection.get_cursor()
+            access_log_dao = AccessLogDao(cursor)
+
+            result = access_log_dao.select_one_exc_by_id(access_log)
+
+        self.assertIsNone(result)
 
 
 if __name__ == '__main__':

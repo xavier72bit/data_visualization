@@ -186,8 +186,12 @@ class AccessLogDao:
 
     def insert_exc(self, access_log: AccessLog):
         insert_sql = 'INSERT INTO access_log (access_log_id, access_date_time, access_token, access_state, delete_flag, access_log_message) VALUES (%s, %s, %s, %s, %s, %s)'
-        params = (access_log.access_log_id, access_log.access_date_time, access_log.access_token,
-                  access_log.access_state, access_log.delete_flag, access_log.access_log_message)
+        params = (access_log.access_log_id,
+                  access_log.access_date_time,
+                  access_log.access_token,
+                  access_log.access_state,
+                  access_log.delete_flag,
+                  access_log.access_log_message)
 
         return self._execute_cursor.execute(insert_sql, params)
 
@@ -199,8 +203,12 @@ class AccessLogDao:
 
     def update_exc(self, access_log: AccessLog):
         update_sql = 'UPDATE access_log SET access_date_time = %s, access_token = %s, access_state = %s, delete_flag = %s, access_log_message = %s WHERE access_log_id = %s'
-        params = (access_log.access_date_time, access_log.access_token, access_log.access_state,
-                  access_log.delete_flag, access_log.access_log_message, access_log.access_log_id)
+        params = (access_log.access_date_time,
+                  access_log.access_token,
+                  access_log.access_state,
+                  access_log.delete_flag,
+                  access_log.access_log_message,
+                  access_log.access_log_id)
 
         return self._execute_cursor.execute(update_sql, params)
 
@@ -261,10 +269,15 @@ class PlotResultDao:
 
     def insert_exc(self, plot_result: PlotResult):
         insert_sql = 'INSERT INTO plot_result (plot_result_id, plot_task_id, plot_result_finish_date_time, plot_result_finish_state, plot_result_local_path, plot_result_upload_date_time, plot_result_upload_state, plot_result_url, delete_flag) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-        params = (plot_result.plot_result_id, plot_result.plot_task_id, plot_result.plot_result_finish_date_time,
-                  plot_result.plot_result_finish_state, plot_result.plot_result_local_path,
+        params = (plot_result.plot_result_id,
+                  plot_result.plot_task_id,
+                  plot_result.plot_result_finish_date_time,
+                  plot_result.plot_result_finish_state,
+                  plot_result.plot_result_local_path,
                   plot_result.plot_result_upload_date_time,
-                  plot_result.plot_result_upload_state, plot_result.plot_result_url, plot_result.delete_flag)
+                  plot_result.plot_result_upload_state,
+                  plot_result.plot_result_url,
+                  plot_result.delete_flag)
 
         return self._execute_cursor.execute(insert_sql, params)
 
@@ -276,9 +289,16 @@ class PlotResultDao:
 
     def update_exc(self, plot_result: PlotResult):
         update_sql = 'UPDATE plot_result SET plot_task_id = %s, plot_result_finish_date_time = %s, plot_result_finish_state = %s, plot_result_local_path = %s, plot_result_upload_date_time = %s, plot_result_upload_state = %s, plot_result_url = %s, delete_flag = %s WHERE plot_result_id = %s'
-        params = (plot_result.plot_task_id, plot_result.plot_result_finish_date_time, plot_result.plot_result_finish_state,
-                  plot_result.plot_result_local_path, plot_result.plot_result_upload_date_time, plot_result.plot_result_upload_state,
-                  plot_result.plot_result_url, plot_result.delete_flag, plot_result.plot_result_id, plot_result.plot_task_id)
+        params = (plot_result.plot_task_id,
+                  plot_result.plot_result_finish_date_time,
+                  plot_result.plot_result_finish_state,
+                  plot_result.plot_result_local_path,
+                  plot_result.plot_result_upload_date_time,
+                  plot_result.plot_result_upload_state,
+                  plot_result.plot_result_url,
+                  plot_result.delete_flag,
+                  plot_result.plot_result_id,
+                  plot_result.plot_task_id)
 
         return self._execute_cursor.execute(update_sql, params)
 
@@ -345,8 +365,12 @@ class PlotTaskDao:
 
     def insert_exc(self, plot_task: PlotTask):
         insert_sql = 'INSERT INTO plot_task (plot_task_id, plot_task_create_date_time, plot_task_finish_date_time, plot_task_state, access_log_id, delete_flag) VALUES (%s, %s, %s, %s, %s, %s)'
-        params = (plot_task.plot_task_id, plot_task.plot_task_create_date_time, plot_task.plot_task_finish_date_time,
-                  plot_task.plot_task_state, plot_task.access_log_id, plot_task.delete_flag)
+        params = (plot_task.plot_task_id,
+                  plot_task.plot_task_create_date_time,
+                  plot_task.plot_task_finish_date_time,
+                  plot_task.plot_task_state,
+                  plot_task.access_log_id,
+                  plot_task.delete_flag)
 
         return self._execute_cursor(insert_sql, params)
 
@@ -358,8 +382,13 @@ class PlotTaskDao:
 
     def update_exc(self, plot_task: PlotTask):
         update_sql = 'UPDATE plot_task SET plot_task_id = %s, plot_task_create_date_time = %s, plot_task_finish_date_time = %s, plot_task_state = %s, access_log_id = %s, delete_flag = %s WHERE plot_task_id = %s'
-        params = (plot_task.plot_task_id, plot_task.plot_task_create_date_time, plot_task.plot_task_finish_date_time,
-                  plot_task.plot_task_state, plot_task.access_log_id, plot_task.delete_flag, plot_task.plot_task_id)
+        params = (plot_task.plot_task_id,
+                  plot_task.plot_task_create_date_time,
+                  plot_task.plot_task_finish_date_time,
+                  plot_task.plot_task_state,
+                  plot_task.access_log_id,
+                  plot_task.delete_flag,
+                  plot_task.plot_task_id)
 
         return self._execute_cursor.execute(update_sql, params)
 

@@ -376,7 +376,7 @@ class PlotTaskDao:
                   plot_task.access_log_id,
                   plot_task.delete_flag)
 
-        return self._execute_cursor(insert_sql, params)
+        return self._execute_cursor.execute(insert_sql, params)
 
     def delete_exc(self, plot_task: PlotTask):
         delete_sql = 'DELETE FROM plot_task WHERE plot_task_id = %s'
@@ -400,7 +400,7 @@ class PlotTaskDao:
         select_one_by_id_sql = 'SELECT plot_task_id, plot_task_create_date_time, plot_task_finish_date_time, plot_task_state, access_log_id, delete_flag FROM plot_task WHERE plot_task_id = %s LIMIT 0, 1'
         params = (plot_task.plot_task_id,)
 
-        exc_result = self._execute_cursor(select_one_by_id_sql, params)
+        exc_result = self._execute_cursor.execute(select_one_by_id_sql, params)
         db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
 
         # TODO: 补充逻辑，查不到记录不应该是异常

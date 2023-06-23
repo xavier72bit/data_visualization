@@ -241,17 +241,17 @@ class PlotTaskDaoBaseTest(unittest.TestCase):
             plot_task_dao = PlotTaskDao(cursor)
             effect_row = 0
 
-        for uuid in uuid_list:
-            plot_task = PlotTask(plot_task_id=uuid,
-                                 plot_task_create_date_time=date_time_now,
-                                 plot_task_finish_date_time=date_time_now,
-                                 plot_task_state=1,
-                                 access_log_id="9DA61402-A1CB-7041-A629-6191494C5767",
-                                 delete_flag=0)
+            for uuid in uuid_list:
+                plot_task = PlotTask(plot_task_id=uuid,
+                                     plot_task_create_date_time=date_time_now,
+                                     plot_task_finish_date_time=date_time_now,
+                                     plot_task_state=1,
+                                     access_log_id="9DA61402-A1CB-7041-A629-6191494C5767",
+                                     delete_flag=0)
 
-            exc_result = plot_task_dao.insert_exc(plot_task)
+                exc_result = plot_task_dao.insert_exc(plot_task)
 
-            effect_row += exc_result
+                effect_row += exc_result
 
         self.assertEqual(effect_row, 10)
 

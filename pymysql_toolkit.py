@@ -219,6 +219,7 @@ class AccessLogDao:
         exc_result = self._execute_cursor.execute(select_one_by_id_sql, params)
         db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
 
+        # TODO: 补充逻辑，查不到记录不应该是异常
         try:
             select_result = self._execute_cursor.fetchone()
             access_log_result = AccessLog(select_result['access_log_id'],
@@ -242,6 +243,7 @@ class AccessLogDao:
 
         access_log_result_list = []
 
+        # TODO: 补充逻辑，查不到记录不应该是异常
         try:
             # 遍历查询到的所有row
             for select_result in self._execute_cursor:
@@ -310,6 +312,7 @@ class PlotResultDao:
 
         db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
 
+        # TODO: 补充逻辑，查不到记录不应该是异常
         try:
             select_result = self._execute_cursor.fetchone()
             plot_result_result = PlotResult(select_result['plot_result_id'],
@@ -336,6 +339,7 @@ class PlotResultDao:
 
         plot_result_result_list = []
 
+        # TODO: 补充逻辑，查不到记录不应该是异常
         try:
             for select_result in self._execute_cursor:
                 plot_result_result = PlotResult(select_result['plot_result_id'],
@@ -399,6 +403,7 @@ class PlotTaskDao:
         exc_result = self._execute_cursor(select_one_by_id_sql, params)
         db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
 
+        # TODO: 补充逻辑，查不到记录不应该是异常
         try:
             select_result = self._execute_cursor.fetchone()
             plot_task_result = PlotTask(select_result['plot_task_id'],
@@ -422,6 +427,7 @@ class PlotTaskDao:
 
         plot_task_result_list = []
 
+        # TODO: 补充逻辑，查不到记录不应该是异常
         try:
             for select_result in self._execute_cursor:
                 plot_task_result = PlotTask(select_result['plot_task_id'],

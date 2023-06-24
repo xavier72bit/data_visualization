@@ -21,7 +21,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
     对AccessLogDao的基本测试
     """
 
-    def test_single_insert_and_single_select(self):
+    def test_a_single_insert_and_single_select(self):
         # 手动新建一个AccessLog对象
         access_log = AccessLog("9DA61402-A1CB-7041-A629-6191494C5767",
                                date_time_now,
@@ -51,7 +51,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         self.assertEqual(access_log.delete_flag, new_access_log.delete_flag)
         self.assertEqual(access_log.access_log_message, new_access_log.access_log_message)
 
-    def test_multi_insert(self):
+    def test_b_multi_insert(self):
         with MysqlConnection(transaction=True) as connection:
             cursor = connection.get_cursor()
             access_log_dao = AccessLogDao(cursor)
@@ -71,7 +71,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
 
             self.assertEqual(effect_row, 10)
 
-    def test_multi_select(self):
+    def test_c_multi_select(self):
         access_token = "test_token_test_token"
         access_log = AccessLog(access_token=access_token)
 
@@ -88,7 +88,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
 
         self.assertEqual(len(result_list), 11)
 
-    def test_delete(self):
+    def test_d_delete(self):
         access_log_id = '9DA61402-A1CB-7041-A629-6191494C57D1'
         access_log = AccessLog(access_log_id=access_log_id)
 
@@ -112,7 +112,7 @@ class PlotResultDaoBaseTest(unittest.TestCase):
     对PlotResultDao的基本测试
     """
 
-    def test_single_insert_and_single_select(self):
+    def test_a_single_insert_and_single_select(self):
         plot_result = PlotResult(plot_result_id="9DA61402-A1CB-7041-A629-6191494C5767",
                                  plot_task_id="9DA61402-A1CB-7041-A629-6191494C5767",
                                  plot_result_finish_date_time=date_time_now,
@@ -145,7 +145,7 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         self.assertEqual(plot_result.plot_result_url, new_plot_result.plot_result_url)
         self.assertEqual(plot_result.delete_flag, new_plot_result.delete_flag)
 
-    def test_multi_insert(self):
+    def test_b_multi_insert(self):
         with MysqlConnection(transaction=True) as connection:
             cursor = connection.get_cursor()
             plot_result_dao = PlotResultDao(cursor)
@@ -168,7 +168,7 @@ class PlotResultDaoBaseTest(unittest.TestCase):
 
             self.assertEqual(effect_row, 10)
 
-    def test_multi_select(self):
+    def test_c_multi_select(self):
         plot_task_id = "9DA61402-A1CB-7041-A629-6191494C5767"
         plot_result = PlotResult(plot_task_id=plot_task_id)
 
@@ -185,7 +185,7 @@ class PlotResultDaoBaseTest(unittest.TestCase):
 
         self.assertEqual(len(result_list), 11)
 
-    def test_delete(self):
+    def test_d_delete(self):
         plot_result_id = '9DA61402-A1CB-7041-A629-6191494C57D1'
         plot_result = PlotResult(plot_result_id=plot_result_id)
 
@@ -208,7 +208,7 @@ class PlotTaskDaoBaseTest(unittest.TestCase):
     """
     对PlotTaskDao的基本测试
     """
-    def test_single_insert_and_single_select(self):
+    def test_a_single_insert_and_single_select(self):
         plot_task = PlotTask(plot_task_id="9DA61402-A1CB-7041-A629-6191494C5767",
                              plot_task_create_date_time=date_time_now,
                              plot_task_finish_date_time=date_time_now,
@@ -235,7 +235,7 @@ class PlotTaskDaoBaseTest(unittest.TestCase):
         self.assertEqual(plot_task.access_log_id, new_plot_task.access_log_id)
         self.assertEqual(plot_task.delete_flag, new_plot_task.delete_flag)
 
-    def test_multi_insert(self):
+    def test_b_multi_insert(self):
         with MysqlConnection(transaction=True) as connection:
             cursor = connection.get_cursor()
             plot_task_dao = PlotTaskDao(cursor)
@@ -255,7 +255,7 @@ class PlotTaskDaoBaseTest(unittest.TestCase):
 
         self.assertEqual(effect_row, 10)
 
-    def test_multi_select(self):
+    def test_c_multi_select(self):
         access_log_id = "9DA61402-A1CB-7041-A629-6191494C5767"
         plot_task = PlotTask(access_log_id=access_log_id)
 
@@ -272,7 +272,7 @@ class PlotTaskDaoBaseTest(unittest.TestCase):
 
         self.assertEqual(len(result_list), 11)
 
-    def test_delete(self):
+    def test_d_delete(self):
         plot_task_id = '9DA61402-A1CB-7041-A629-6191494C57D1'
         plot_task = PlotTask(plot_task_id=plot_task_id)
 

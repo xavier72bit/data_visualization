@@ -2,6 +2,7 @@ import pymysql
 import config_util
 import logging_util
 from dbutils.pooled_db import PooledDB
+from pymysql.cursors import DictCursor
 
 __all__ = ["MysqlConnection",
            "AccessLog", "PlotResult", "PlotTask",
@@ -69,7 +70,7 @@ class MysqlConnection:
             db_util_logger.info("MySQL连接开启，当前连接{0}".format(self._this_connection))
 
         try:
-            self._this_cursor = self._this_connection.cursor(pymysql.cursors.DictCursor)
+            self._this_cursor = self._this_connection.cursor(DictCursor)
         except Exception as get_cursor_err:
             db_util_logger.error("MySQL光标获取失败，错误原因：{0}".format(get_cursor_err))
         else:
@@ -178,8 +179,6 @@ class PlotTask:
 class AccessLogDao:
     """
     access_log表的操作
-
-    #TODO: 差一个查询所有access_token
     """
     def __init__(self, cursor):
         self._execute_cursor = cursor
@@ -217,49 +216,54 @@ class AccessLogDao:
         params = (access_log.access_log_id,)
 
         exc_result = self._execute_cursor.execute(select_one_by_id_sql, params)
-        db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
 
-        # TODO: 补充逻辑，查不到记录不应该是异常
-        try:
-            select_result = self._execute_cursor.fetchone()
-            access_log_result = AccessLog(select_result['access_log_id'],
-                                          select_result['access_date_time'],
-                                          select_result['access_token'],
-                                          select_result['access_state'],
-                                          select_result['delete_flag'],
-                                          select_result['access_log_message'])
-        except Exception as select_exc_err:
-            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
-            return None
-        else:
-            return access_log_result
-
-    def select_list_exc_by_access_token(self, access_log: AccessLog):
-        select_list_by_access_token_sql = 'SELECT access_log_id, access_date_time, access_token, access_state, delete_flag, access_log_message FROM access_log WHERE access_token LIKE %s'
-        params = (access_log.access_token,)
-
-        exc_result = self._execute_cursor.execute(select_list_by_access_token_sql, params)
-        db_util_logger.info("select_list_exc_by_access_token查询到{0}条结果".format(exc_result))
-
-        access_log_result_list = []
-
-        # TODO: 补充逻辑，查不到记录不应该是异常
-        try:
-            # 遍历查询到的所有row
-            for select_result in self._execute_cursor:
+        if exc_result:
+            try:
+                db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
+                select_result = self._execute_cursor.fetchone()
                 access_log_result = AccessLog(select_result['access_log_id'],
                                               select_result['access_date_time'],
                                               select_result['access_token'],
                                               select_result['access_state'],
                                               select_result['delete_flag'],
                                               select_result['access_log_message'])
-
-                access_log_result_list.append(access_log_result)
-        except Exception as select_exc_err:
-            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
-            return None
+            except Exception as select_exc_err:
+                db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
+                return None
+            else:
+                return access_log_result
         else:
-            return access_log_result_list
+            db_util_logger.info("select_one_exc_by_id未查到任何结果")
+            return None
+
+    def select_list_exc_by_access_token(self, access_log: AccessLog):
+        select_list_by_access_token_sql = 'SELECT access_log_id, access_date_time, access_token, access_state, delete_flag, access_log_message FROM access_log WHERE access_token LIKE %s'
+        params = (access_log.access_token,)
+
+        exc_result = self._execute_cursor.execute(select_list_by_access_token_sql, params)
+        access_log_result_list = []
+
+        if exc_result:
+            try:
+                db_util_logger.info("select_list_exc_by_access_token查询到{0}条结果".format(exc_result))
+                # 遍历查询到的所有row
+                for select_result in self._execute_cursor:
+                    access_log_result = AccessLog(select_result['access_log_id'],
+                                                  select_result['access_date_time'],
+                                                  select_result['access_token'],
+                                                  select_result['access_state'],
+                                                  select_result['delete_flag'],
+                                                  select_result['access_log_message'])
+
+                    access_log_result_list.append(access_log_result)
+            except Exception as select_exc_err:
+                db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
+                return None
+            else:
+                return access_log_result_list
+        else:
+            db_util_logger.info("select_list_exc_by_access_token未查到任何结果")
+            return None
 
 
 class PlotResultDao:
@@ -310,38 +314,10 @@ class PlotResultDao:
 
         exc_result = self._execute_cursor.execute(select_one_by_id_sql, params)
 
-        db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
-
-        # TODO: 补充逻辑，查不到记录不应该是异常
-        try:
-            select_result = self._execute_cursor.fetchone()
-            plot_result_result = PlotResult(select_result['plot_result_id'],
-                                            select_result['plot_task_id'],
-                                            select_result['plot_result_finish_date_time'],
-                                            select_result['plot_result_finish_state'],
-                                            select_result['plot_result_local_path'],
-                                            select_result['plot_result_upload_date_time'],
-                                            select_result['plot_result_upload_state'],
-                                            select_result['plot_result_url'],
-                                            select_result['delete_flag'])
-        except Exception as select_exc_err:
-            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
-            return None
-        else:
-            return plot_result_result
-
-    def select_list_exc_by_plot_task_id(self, plot_result: PlotResult):
-        select_list_by_plot_task_id_sql = 'SELECT plot_result_id, plot_task_id, plot_result_finish_date_time, plot_result_finish_state, plot_result_local_path, plot_result_upload_date_time, plot_result_upload_state, plot_result_url, delete_flag FROM plot_result WHERE plot_task_id LIKE %s'
-        params = (plot_result.plot_task_id,)
-
-        exc_result = self._execute_cursor.execute(select_list_by_plot_task_id_sql, params)
-        db_util_logger.info("select_list_exc_by_plot_task_id查询到{0}条结果".format(exc_result))
-
-        plot_result_result_list = []
-
-        # TODO: 补充逻辑，查不到记录不应该是异常
-        try:
-            for select_result in self._execute_cursor:
+        if exc_result:
+            try:
+                db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
+                select_result = self._execute_cursor.fetchone()
                 plot_result_result = PlotResult(select_result['plot_result_id'],
                                                 select_result['plot_task_id'],
                                                 select_result['plot_result_finish_date_time'],
@@ -351,13 +327,45 @@ class PlotResultDao:
                                                 select_result['plot_result_upload_state'],
                                                 select_result['plot_result_url'],
                                                 select_result['delete_flag'])
-
-                plot_result_result_list.append(plot_result_result)
-        except Exception as select_exc_err:
-            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
-            return None
+            except Exception as select_exc_err:
+                db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
+                return None
+            else:
+                return plot_result_result
         else:
-            return plot_result_result_list
+            db_util_logger.info("select_one_exc_by_id未查到任何结果")
+            return None
+
+    def select_list_exc_by_plot_task_id(self, plot_result: PlotResult):
+        select_list_by_plot_task_id_sql = 'SELECT plot_result_id, plot_task_id, plot_result_finish_date_time, plot_result_finish_state, plot_result_local_path, plot_result_upload_date_time, plot_result_upload_state, plot_result_url, delete_flag FROM plot_result WHERE plot_task_id LIKE %s'
+        params = (plot_result.plot_task_id,)
+
+        exc_result = self._execute_cursor.execute(select_list_by_plot_task_id_sql, params)
+        plot_result_result_list = []
+
+        if exc_result:
+            try:
+                db_util_logger.info("select_list_exc_by_plot_task_id查询到{0}条结果".format(exc_result))
+                for select_result in self._execute_cursor:
+                    plot_result_result = PlotResult(select_result['plot_result_id'],
+                                                    select_result['plot_task_id'],
+                                                    select_result['plot_result_finish_date_time'],
+                                                    select_result['plot_result_finish_state'],
+                                                    select_result['plot_result_local_path'],
+                                                    select_result['plot_result_upload_date_time'],
+                                                    select_result['plot_result_upload_state'],
+                                                    select_result['plot_result_url'],
+                                                    select_result['delete_flag'])
+
+                    plot_result_result_list.append(plot_result_result)
+            except Exception as select_exc_err:
+                db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
+                return None
+            else:
+                return plot_result_result_list
+        else:
+            db_util_logger.info("select_list_exc_by_plot_task_id未查到任何结果")
+            return None
 
 
 class PlotTaskDao:
@@ -401,45 +409,50 @@ class PlotTaskDao:
         params = (plot_task.plot_task_id,)
 
         exc_result = self._execute_cursor.execute(select_one_by_id_sql, params)
-        db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
 
-        # TODO: 补充逻辑，查不到记录不应该是异常
-        try:
-            select_result = self._execute_cursor.fetchone()
-            plot_task_result = PlotTask(select_result['plot_task_id'],
-                                        select_result['plot_task_create_date_time'],
-                                        select_result['plot_task_finish_date_time'],
-                                        select_result['plot_task_state'],
-                                        select_result['access_log_id'],
-                                        select_result['delete_flag'])
-        except Exception as select_exc_err:
-            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
-            return None
-        else:
-            return plot_task_result
-
-    def select_list_exc_by_access_log_id(self, plot_task: PlotTask):
-        select_list_by_access_log_id_sql = 'SELECT plot_task_id, plot_task_create_date_time, plot_task_finish_date_time, plot_task_state, access_log_id, delete_flag FROM plot_task WHERE access_log_id LIKE %s'
-        params = (plot_task.access_log_id,)
-
-        exc_result = self._execute_cursor.execute(select_list_by_access_log_id_sql, params)
-        db_util_logger.info("select_list_exc_by_access_log_id查询到{0}条结果".format(exc_result))
-
-        plot_task_result_list = []
-
-        # TODO: 补充逻辑，查不到记录不应该是异常
-        try:
-            for select_result in self._execute_cursor:
+        if exc_result:
+            try:
+                db_util_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
+                select_result = self._execute_cursor.fetchone()
                 plot_task_result = PlotTask(select_result['plot_task_id'],
                                             select_result['plot_task_create_date_time'],
                                             select_result['plot_task_finish_date_time'],
                                             select_result['plot_task_state'],
                                             select_result['access_log_id'],
                                             select_result['delete_flag'])
-
-                plot_task_result_list.append(plot_task_result)
-        except Exception as select_exc_err:
-            db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
-            return None
+            except Exception as select_exc_err:
+                db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
+                return None
+            else:
+                return plot_task_result
         else:
-            return plot_task_result_list
+            db_util_logger.info("select_one_exc_by_id未查询到任何结果")
+            return None
+
+    def select_list_exc_by_access_log_id(self, plot_task: PlotTask):
+        select_list_by_access_log_id_sql = 'SELECT plot_task_id, plot_task_create_date_time, plot_task_finish_date_time, plot_task_state, access_log_id, delete_flag FROM plot_task WHERE access_log_id LIKE %s'
+        params = (plot_task.access_log_id,)
+
+        exc_result = self._execute_cursor.execute(select_list_by_access_log_id_sql, params)
+        plot_task_result_list = []
+
+        if exc_result:
+            try:
+                db_util_logger.info("select_list_exc_by_access_log_id查询到{0}条结果".format(exc_result))
+                for select_result in self._execute_cursor:
+                    plot_task_result = PlotTask(select_result['plot_task_id'],
+                                                select_result['plot_task_create_date_time'],
+                                                select_result['plot_task_finish_date_time'],
+                                                select_result['plot_task_state'],
+                                                select_result['access_log_id'],
+                                                select_result['delete_flag'])
+
+                    plot_task_result_list.append(plot_task_result)
+            except Exception as select_exc_err:
+                db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
+                return None
+            else:
+                return plot_task_result_list
+        else:
+            db_util_logger.info("select_list_exc_by_access_log_id未查询到任何结果")
+            return None

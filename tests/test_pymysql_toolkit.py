@@ -1,6 +1,13 @@
 import datetime
 import unittest
-from pymysql_toolkit import MysqlConnection, AccessLog, AccessLogDao, PlotResult, PlotResultDao, PlotTask, PlotTaskDao
+
+from api.dao.access_log_dao import AccessLogDao
+from api.dao.plot_result_dao import PlotResultDao
+from api.dao.plot_task_dao import PlotTaskDao
+from api.domain.access_log import AccessLog
+from api.domain.plot_result import PlotResult
+from api.domain.plot_task import PlotTask
+from utils.pymysql_util import MysqlConnection
 
 date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 

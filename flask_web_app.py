@@ -1,8 +1,7 @@
 import flask
-import config_util
-import logging_util
+from utils import config_util, logging_util
 from flask import Flask
-from pymysql_toolkit import MysqlConnection
+from utils.pymysql_util import MysqlConnection
 
 
 # -----------------------------------------------------

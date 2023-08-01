@@ -1,5 +1,6 @@
 __all__ = ["AccessLog"]
 
+
 class AccessLog:
     """
     access_log表的数据对象

@@ -57,7 +57,7 @@ class AccessLogDao:
                                               select_result['delete_flag'],
                                               select_result['access_log_message'])
             except Exception as select_exc_err:
-                db_util_logger.warning("row转换数据对象失败, {0}".format(select_exc_err))
+                db_util_logger.warning("row转换为数据对象失败, {0}".format(select_exc_err))
                 return None
             else:
                 return access_log_result

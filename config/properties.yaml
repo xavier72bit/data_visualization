@@ -19,8 +19,8 @@ database_connection_pool:
   password: "123456"
   # 数据库端口
   port: 3306
-  # 字符编码（注意格式为 'UTF8'，不是 'utf-8'）
-  charset: "UTF8"
+  # 字符编码
+  charset: "utf8mb4"
   # 连接池中空闲连接的初始数量
   min_cached: 10
   # 连接池中空闲连接的最大数量

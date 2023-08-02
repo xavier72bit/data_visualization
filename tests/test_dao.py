@@ -1,6 +1,5 @@
 import datetime
 import unittest
-from utils.pymysql_util import MysqlConnection
 
 from api.domain.access_log import AccessLog
 from api.domain.plot_result import PlotResult
@@ -35,16 +34,11 @@ class AccessLogDaoBaseTest(unittest.TestCase):
                                "This is a test")
 
         # 将这个AccessLog对象信息插入数据库
-        with MysqlConnection() as connection:
-            # 新建一个AccessLogDao对象，将当前的连接的Cursor传入
-            cursor = connection.get_cursor()
-            access_log_dao = AccessLogDao(cursor)
+        with AccessLogDao() as access_log_dao:
             access_log_dao.insert_exc(access_log)
 
-        # 验证过程，另外开启一个连接，查询
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            access_log_dao = AccessLogDao(cursor)
+        # 验证过程，另外开启一个连接，查询刚刚插入的信息
+        with AccessLogDao() as access_log_dao:
             new_access_log = access_log_dao.select_one_exc_by_id(access_log)
 
         print(new_access_log)
@@ -55,9 +49,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         self.assertEqual(access_log.access_log_message, new_access_log.access_log_message)
 
     def test_b_multi_insert(self):
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            access_log_dao = AccessLogDao(cursor)
+        with AccessLogDao() as access_log_dao:
             effect_row = 0
 
             for uuid in uuid_list:
@@ -77,10 +69,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         access_token = "test_token_test_token"
         access_log = AccessLog(access_token=access_token)
 
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            access_log_dao = AccessLogDao(cursor)
-
+        with AccessLogDao() as access_log_dao:
             result_list = access_log_dao.select_list_exc_by_access_token(access_log)
 
         print(result_list)
@@ -94,16 +83,10 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         access_log_id = '9DA61402-A1CB-7041-A629-6191494C57D1'
         access_log = AccessLog(access_log_id=access_log_id)
 
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            access_log_dao = AccessLogDao(cursor)
-
+        with AccessLogDao() as access_log_dao:
             access_log_dao.delete_exc(access_log)
 
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            access_log_dao = AccessLogDao(cursor)
-
+        with AccessLogDao() as access_log_dao:
             result = access_log_dao.select_one_exc_by_id(access_log)
 
         self.assertIsNone(result)
@@ -124,15 +107,11 @@ class PlotResultDaoBaseTest(unittest.TestCase):
                                  plot_result_upload_state=1,
                                  plot_result_url="test_example_url")
 
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            plot_result_dao = PlotResultDao(cursor)
-            plot_result_dao.insert_exc(plot_result)
+        with PlotResultDao() as prd:
+            prd.insert_exc(plot_result)
 
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            plot_result_dao = PlotResultDao(cursor)
-            new_plot_result = plot_result_dao.select_one_exc_by_id(plot_result)
+        with PlotResultDao() as prd:
+            new_plot_result = prd.select_one_exc_by_id(plot_result)
 
         self.assertEqual(plot_result.plot_result_id, new_plot_result.plot_result_id)
         self.assertEqual(plot_result.access_log_id, new_plot_result.access_log_id)
@@ -146,9 +125,7 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         self.assertEqual(plot_result.plot_result_url, new_plot_result.plot_result_url)
 
     def test_b_multi_insert(self):
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            plot_result_dao = PlotResultDao(cursor)
+        with PlotResultDao() as prd:
             effect_row = 0
 
             for uuid, index in zip(uuid_list, range(10)):
@@ -161,21 +138,18 @@ class PlotResultDaoBaseTest(unittest.TestCase):
                                          plot_result_upload_state=1,
                                          plot_result_url="test_example_url")
 
-                exc_result = plot_result_dao.insert_exc(plot_result)
+                exc_result = prd.insert_exc(plot_result)
 
                 effect_row += exc_result
 
-            self.assertEqual(effect_row, 10)
+        self.assertEqual(effect_row, 10)
 
     def test_c_multi_select(self):
         access_log_id = "9DA61402-A1CB-7041-A629-6191494C5767"
         plot_result = PlotResult(access_log_id=access_log_id)
 
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            plot_result_dao = PlotResultDao(cursor)
-
-            result_list = plot_result_dao.select_list_exc_by_access_log_id(plot_result)
+        with PlotResultDao() as prd:
+            result_list = prd.select_list_exc_by_access_log_id(plot_result)
 
         print(result_list)
 
@@ -188,17 +162,11 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         plot_result_id = '9DA61402-A1CB-7041-A629-6191494C57D1'
         plot_result = PlotResult(plot_result_id=plot_result_id)
 
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            plot_result_dao = PlotResultDao(cursor)
+        with PlotResultDao() as prd:
+            prd.delete_exc(plot_result)
 
-            plot_result_dao.delete_exc(plot_result)
-
-        with MysqlConnection() as connection:
-            cursor = connection.get_cursor()
-            plot_result_dao = PlotResultDao(cursor)
-
-            result = plot_result_dao.select_one_exc_by_id(plot_result)
+        with PlotResultDao() as prd:
+            result = prd.select_one_exc_by_id(plot_result)
 
         self.assertIsNone(result)
 

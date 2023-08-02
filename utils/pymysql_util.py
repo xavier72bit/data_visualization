@@ -1,28 +1,26 @@
 import pymysql
-import functools
 from utils import config_util, logging_util
 from dbutils.pooled_db import PooledDB
-from pymysql.cursors import DictCursor
 
-__all__ = ["MysqlConnection"]
+__all__ = ["connection_pool"]
 
 # -----------------------------------------------------
 # 模块初始化
 # -----------------------------------------------------
 
 # 初始化本模块的日志
-db_util_logger = logging_util.std_init_module_logging(__name__, 'DEBUG', 'db_util.log')
+pymysql_util_logger = logging_util.std_init_module_logging(__name__, 'DEBUG', '{0}.log'.format(__name__))
 
 # 导入配置
 database_connection_pool_config = config_util.read_yaml('properties.yaml')['database_connection_pool']
-db_util_logger.info('数据库连接池配置：{0}'.format(database_connection_pool_config))
+pymysql_util_logger.info('数据库连接池配置：{0}'.format(database_connection_pool_config))
 
 # -----------------------------------------------------
 # 数据库连接池初始化
 # -----------------------------------------------------
 
 try:
-    db_util_logger.info('开始初始化数据库连接池')
+    pymysql_util_logger.info('开始初始化数据库连接池')
     connection_pool = PooledDB(creator=pymysql,
                                host=database_connection_pool_config['host'],
                                database=database_connection_pool_config['db'],
@@ -40,60 +38,6 @@ try:
                                reset=database_connection_pool_config['reset']
                                )
 except Exception as e:
-    db_util_logger.critical('初始化数据库连接池失败，错误: {0}'.format(e))
+    pymysql_util_logger.critical('初始化数据库连接池失败，错误: {0}'.format(e))
 else:
-    db_util_logger.info('数据库初始化成功')
-
-
-# -----------------------------------------------------
-# MySQL数据库连接
-# -----------------------------------------------------
-
-class MysqlConnection:
-    """
-    MySQL连接
-    """
-
-    def __enter__(self):
-        db_util_logger.debug("从连接池获取连接")
-
-        try:
-            self._this_connection = connection_pool.connection()
-        except Exception as get_connection_err:
-            db_util_logger.error("MySQL连接获取失败，错误原因：{0}".format(get_connection_err))
-        else:
-            db_util_logger.info("MySQL连接获取成功，当前连接{0}".format(self._this_connection))
-
-        try:
-            self._this_cursor = self._this_connection.cursor(DictCursor)
-        except Exception as get_cursor_err:
-            db_util_logger.error("MySQL光标获取失败，错误原因：{0}".format(get_cursor_err))
-        else:
-            db_util_logger.info("MySQL光标获取成功，当前光标{0}".format(self._this_cursor))
-
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        # 退出环境时自动关闭连接与光标
-        self._this_cursor.close()
-        db_util_logger.info('光标：{0}，已关闭'.format(self._this_cursor))
-        self._this_connection.close()
-        db_util_logger.info('连接：{0}，已关闭'.format(self._this_connection))
-
-    def get_cursor(self):
-        """
-        从数据库连接中获取光标
-
-        :return: cursor
-        """
-        return self._this_cursor
-
-
-# -----------------------------------------------------
-# MySQL开启事务装饰器
-# -----------------------------------------------------
-
-def start_transaction(service_function):
-    @functools.wraps(service_function)
-    def wrapper(*args, **kwargs):
-        pass
+    pymysql_util_logger.info('数据库连接池初始化成功')

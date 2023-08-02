@@ -10,109 +10,17 @@
 
 ### 数据源绘图（POST）
 
-
-示例：
-
-```json
-{
-	user: 'user_name',
-	access_time: '2022-03-01',
-	plot_title: '标题',
-	data_source: [
-		{
-			type: 'catalog',
-			content: ['类别1', '类别2', '类别3'],
-			annotation: '注释'
-		},
-		{
-			type: 'date',
-			content: ['2022-01-01', '2022-01-02', '2022-01-03'],
-			annotation: '注释'
-		},
-		{
-			type: 'date',
-			date_start: '2022-01-01',
-			date_end: '2022-01-03',
-			date_delta: '1d',
-			annotation: '注释'
-		},
-		{
-			type: 'number',
-			content: [123, 456, 789],
-			annotation: '注释'
-		}
-	]
-}
-```
-
 ### 对象绘图（POST）
-
-
-示例：
-
-```json
-{
-	user: 'userName',
-	access_time: '2022-03-01',
-	plot_title: '标题',
-	object_meta: {
-		date_time: 'time',
-		task_number: 'number',
-		build_name: 'catalog'
-	},
-	objects: [
-		{
-			date_time: '2021-01-01',
-			task_number: 123,
-			build_name: '旅顺校区13号楼'
-		},
-		{
-			date_time: '2021-01-02',
-			task_number: 4,
-			build_name: '旅顺校区13号楼'
-		},
-		{
-			date_time: '2021-01-03',
-			task_number: 643,
-			build_name: '旅顺校区13号楼'
-		},
-		{
-			date_time: '2021-01-04',
-			task_number: 1234,
-			build_name: '旅顺校区13号楼'
-		},
-		{
-			date_time: '2021-01-05',
-			task_number: 55,
-			build_name: '旅顺校区13号楼'
-		},
-		{
-			date_time: '2021-01-06',
-			task_number: 32,
-			build_name: '旅顺校区13号楼'
-		},
-		{
-			date_time: '2021-01-07',
-			task_number: 767,
-			build_name: '旅顺校区13号楼'
-		}
-	]
-}
-```
 
 ### 系统信息（GET）
 
 `/api/sysinfo`
 
-### 任务单（GET）
-
-`/api/task/{TASK_ID}`
-
 ## 数据规范
 
 ### 数据类型
 
-1. 时间
+#### 时间
 
 开始时间（2020-01-01 或者 2020/01/01）  
 结束时间（2022-01-07 或者 2020/01/07）  
@@ -120,16 +28,36 @@
 
 值列表
 
-2. 数据
+#### 数据
 
 值列表
 
-3. 类别
+#### 类别
 
 值列表
 
 ### 维度规范
 
-1. 二维数据是两个序列
+二维数据是两个序列
 
-2. 三维数据是一个序列和一个字典
+三维数据是一个序列和一个字典
+
+# 开发日志
+
+## 2023.08.02
+
+暂时不去考虑plot_task、多线程、mysql事务
+
+关于不使用mysql事务：
+由于不涉及需要开启事务的情况，原因有2：
+1. 程序暂不支持并发，所有的操作都是顺序执行的 
+2. 批量插入的操作准备进行sql拼接，用一条sql语句插入多条数据
+
+关于plot_task任务单：
+决定剔除plot_task任务单，access_log表中的access_log_id已经可以充当plot_task的功能，没必要维护一个plot_result
+
+首先将绘图功能实现，大体流程是：
+1. 用户访问接口，access_log记录
+2. 顺序的方式生成plot_result，生成的过程包括：生成图片 --> 上传图片到fastdfs
+3. 向用户返回结果
+

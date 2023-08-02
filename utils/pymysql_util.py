@@ -1,4 +1,5 @@
 import pymysql
+import functools
 from utils import config_util, logging_util
 from dbutils.pooled_db import PooledDB
 from pymysql.cursors import DictCursor
@@ -53,18 +54,15 @@ class MysqlConnection:
     MySQL连接
     """
 
-    def __init__(self, transaction=False):
-        self._transaction = transaction
-
     def __enter__(self):
         db_util_logger.debug("从连接池获取连接")
 
         try:
             self._this_connection = connection_pool.connection()
         except Exception as get_connection_err:
-            db_util_logger.error("MySQL连接开启失败，错误原因：{0}".format(get_connection_err))
+            db_util_logger.error("MySQL连接获取失败，错误原因：{0}".format(get_connection_err))
         else:
-            db_util_logger.info("MySQL连接开启，当前连接{0}".format(self._this_connection))
+            db_util_logger.info("MySQL连接获取成功，当前连接{0}".format(self._this_connection))
 
         try:
             self._this_cursor = self._this_connection.cursor(DictCursor)
@@ -73,25 +71,9 @@ class MysqlConnection:
         else:
             db_util_logger.info("MySQL光标获取成功，当前光标{0}".format(self._this_cursor))
 
-        # 判断是否显式开启事务
-        if self._transaction:
-            self._this_connection.begin()
-            db_util_logger.info("开启事务")
-
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if exc_type is None:
-            if self._transaction:
-                # 未发生异常提交事务
-                self._this_connection.commit()
-                db_util_logger.info("事务已提交")
-        else:
-            if self._transaction:
-                # 发生异常回滚
-                self._this_connection.rollback()
-                db_util_logger.info("事务已回滚")
-
         # 退出环境时自动关闭连接与光标
         self._this_cursor.close()
         db_util_logger.info('光标：{0}，已关闭'.format(self._this_cursor))
@@ -105,3 +87,13 @@ class MysqlConnection:
         :return: cursor
         """
         return self._this_cursor
+
+
+# -----------------------------------------------------
+# MySQL开启事务装饰器
+# -----------------------------------------------------
+
+def start_transaction(service_function):
+    @functools.wraps(service_function)
+    def wrapper(*args, **kwargs):
+        pass

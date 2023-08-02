@@ -33,7 +33,7 @@ database_connection_pool:
   blocking: TRUE
   # 单个连接的最大重复使用次数（O 或 None 为无限制）
   max_usage: 100
-  # 准备session的SQL语句列表(可选)（比如： ["set datestyle to ...", "set time zone ..."]）
-  set_session: ['SET AUTOCOMMIT = 1']
+  # 准备session的SQL语句列表(可选)（比如： ["set datestyle to ...", "set time zone ...", "SET AUTOCOMMIT = 1"]）
+  set_session: ["SET AUTOCOMMIT = 1"]
   # 设定当连接用完返回到连接池时，该如何重置连接（为 False 或 None 时，回滚以 `connection.begin()` 开始的事务；为 True 时，始终为了安全起见发起回滚）
   reset: TRUE

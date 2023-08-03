@@ -1,3 +1,4 @@
+import uuid
 import datetime
 import unittest
 
@@ -8,86 +9,98 @@ from api.dao.plot_result_dao import PlotResultDao
 
 date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-uuid_list = ["9DA61402-A1CB-7041-A629-6191494C57DC",
-             "9DA61402-A1CB-7041-A629-6191494C57D1",
-             "9DA61402-A1CB-7041-A629-6191494C57D2",
-             "9DA61402-A1CB-7041-A629-6191494C57D3",
-             "9DA61402-A1CB-7041-A629-6191494C57D4",
-             "9DA61402-A1CB-7041-A629-6191494C57D5",
-             "9DA61402-A1CB-7041-A629-6191494C57D6",
-             "9DA61402-A1CB-7041-A629-6191494C57D7",
-             "9DA61402-A1CB-7041-A629-6191494C57D8",
-             "9DA61402-A1CB-7041-A629-6191494C57D9"]
-
 
 class AccessLogDaoBaseTest(unittest.TestCase):
     """
     对AccessLogDao的基本测试
     """
-
-    def test_a_single_insert_and_single_select(self):
-        # 手动新建一个AccessLog对象
-        access_log = AccessLog("9DA61402-A1CB-7041-A629-6191494C5767",
+    def test_a_insert_one_exc_and_select_one_exc_by_id(self):
+        """
+        单条插入 与 单条查询 测试
+        """
+        # 新建一个access_log
+        access_log = AccessLog(uuid.uuid4(),
                                date_time_now,
-                               "test_token_test_token",
+                               "test_token_from_test_a",
                                0,
                                "This is a test")
 
-        # 将这个AccessLog对象信息插入数据库
-        with AccessLogDao() as access_log_dao:
-            access_log_dao.insert_one_exc(access_log)
+        # 插入操作
+        with AccessLogDao() as ald:
+            ald.insert_one_exc(access_log)
 
-        # 验证过程，另外开启一个连接，查询刚刚插入的信息
-        with AccessLogDao() as access_log_dao:
-            new_access_log = access_log_dao.select_one_exc_by_id(access_log)
+        # 查询刚刚插入的信息
+        with AccessLogDao() as ald:
+            new_access_log = ald.select_one_exc_by_id(access_log)
 
         print(new_access_log)
-        self.assertEqual(access_log.access_log_id, new_access_log.access_log_id)
+        self.assertEqual(str(access_log.access_log_id), str(new_access_log.access_log_id))
         self.assertEqual(access_log.access_date_time, new_access_log.access_date_time.strftime("%Y-%m-%d %H:%M:%S"))
         self.assertEqual(access_log.access_token, new_access_log.access_token)
         self.assertEqual(access_log.access_state, new_access_log.access_state)
         self.assertEqual(access_log.access_log_message, new_access_log.access_log_message)
 
-    def test_b_multi_insert(self):
-        with AccessLogDao() as access_log_dao:
-            effect_row = 0
+    def test_b_multi_insert_one_exc(self):
+        """
+        单条插入 执行1000次
+        """
+        affect_row = 0
 
-            for uuid in uuid_list:
-                access_log = AccessLog(uuid,
+        with AccessLogDao() as ald:
+            for i in range(1000):
+                # 新建一个access_log
+                access_log = AccessLog(uuid.uuid4(),
                                        date_time_now,
-                                       "test_token_test_token",
+                                       "test_token_from_test_b",
                                        0,
-                                       "This is a test")
+                                       "This is a test{0}".format(i))
 
-                exc_result = access_log_dao.insert_one_exc(access_log)
+                # 将这个access_log信息插入数据库
+                exec_affect_row = ald.insert_one_exc(access_log)
+                affect_row += exec_affect_row
 
-                effect_row += exc_result
+        self.assertEqual(affect_row, 1000)
 
-            self.assertEqual(effect_row, 10)
-
-    def test_c_multi_select(self):
-        access_token = "test_token_test_token"
+    def test_c_select_list_exc_by_access_token(self):
+        """
+        多条查询测试，查询test_b中插入的1000条数据
+        """
+        # 新建access_log
+        access_token = "test_token_from_test_b"
         access_log = AccessLog(access_token=access_token)
 
-        with AccessLogDao() as access_log_dao:
-            result_list = access_log_dao.select_list_exc_by_access_token(access_log)
+        with AccessLogDao() as ald:
+            result_list = ald.select_list_exc_by_access_token(access_log)
 
         print(result_list)
 
         for result in result_list:
             print(result.access_log_id, end=',')
 
-        self.assertEqual(len(result_list), 11)
+        self.assertEqual(len(result_list), 1000)
 
-    def test_d_delete(self):
-        access_log_id = '9DA61402-A1CB-7041-A629-6191494C57D1'
-        access_log = AccessLog(access_log_id=access_log_id)
+    def test_d_insert_one_exc_and_delete_one_exc_by_id(self):
+        """
+        单条插入 和 单条删除 测试
+        """
 
-        with AccessLogDao() as access_log_dao:
-            access_log_dao.delete_one_exc_by_id(access_log)
+        # 生成并插入一个access_log
+        access_log = AccessLog(uuid.uuid4(),
+                               date_time_now,
+                               "test_token_from_test_c",
+                               0,
+                               "This is a test")
 
-        with AccessLogDao() as access_log_dao:
-            result = access_log_dao.select_one_exc_by_id(access_log)
+        with AccessLogDao() as ald:
+            ald.insert_one_exc(access_log)
+
+        # 删除这条记录
+        with AccessLogDao() as ald:
+            ald.delete_one_exc_by_id(access_log)
+
+        # 最后查询这条记录
+        with AccessLogDao() as ald:
+            result = ald.select_one_exc_by_id(access_log)
 
         self.assertIsNone(result)
 
@@ -98,8 +111,12 @@ class PlotResultDaoBaseTest(unittest.TestCase):
     """
 
     def test_a_single_insert_and_single_select(self):
-        plot_result = PlotResult(plot_result_id="9DA61402-A1CB-7041-A629-6191494C5767",
-                                 access_log_id="9DA61402-A1CB-7041-A629-6191494C5767",
+        """
+        单条插入 与 单条查询 测试
+        """
+        # 手动生成一个plot_result
+        plot_result = PlotResult(plot_result_id=uuid.uuid4(),
+                                 access_log_id=uuid.uuid4(),
                                  plot_result_finish_date_time=date_time_now,
                                  plot_result_finish_state=1,
                                  plot_result_local_path="/tmp/test/temp_plot/test_result",
@@ -107,44 +124,62 @@ class PlotResultDaoBaseTest(unittest.TestCase):
                                  plot_result_upload_state=1,
                                  plot_result_url="test_example_url")
 
+        # 插入这条plot_result
         with PlotResultDao() as prd:
-            prd.insert_exc(plot_result)
+            prd.insert_one_exc(plot_result)
 
+        # 查询刚生成的这条plot_result
         with PlotResultDao() as prd:
             new_plot_result = prd.select_one_exc_by_id(plot_result)
 
-        self.assertEqual(plot_result.plot_result_id, new_plot_result.plot_result_id)
-        self.assertEqual(plot_result.access_log_id, new_plot_result.access_log_id)
+        print(new_plot_result)
+        self.assertEqual(str(plot_result.plot_result_id),
+                         str(new_plot_result.plot_result_id))
+        self.assertEqual(str(plot_result.access_log_id),
+                         str(new_plot_result.access_log_id))
         self.assertEqual(plot_result.plot_result_finish_date_time,
                          new_plot_result.plot_result_finish_date_time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.assertEqual(plot_result.plot_result_finish_state, new_plot_result.plot_result_finish_state)
-        self.assertEqual(plot_result.plot_result_local_path, new_plot_result.plot_result_local_path)
+        self.assertEqual(plot_result.plot_result_finish_state,
+                         new_plot_result.plot_result_finish_state)
+        self.assertEqual(plot_result.plot_result_local_path,
+                         new_plot_result.plot_result_local_path)
         self.assertEqual(plot_result.plot_result_upload_date_time,
                          new_plot_result.plot_result_upload_date_time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.assertEqual(plot_result.plot_result_upload_state, new_plot_result.plot_result_upload_state)
-        self.assertEqual(plot_result.plot_result_url, new_plot_result.plot_result_url)
+        self.assertEqual(plot_result.plot_result_upload_state,
+                         new_plot_result.plot_result_upload_state)
+        self.assertEqual(plot_result.plot_result_url,
+                         new_plot_result.plot_result_url)
 
-    def test_b_multi_insert(self):
+    def test_b_multi_insert_one_exc(self):
+        """
+        单条插入 执行1000次
+        """
+        affect_row = 0
+        access_log_id = "9DA61402-A1CB-7041-A629-6191494C5767"
+
         with PlotResultDao() as prd:
-            effect_row = 0
-
-            for uuid, index in zip(uuid_list, range(10)):
-                plot_result = PlotResult(plot_result_id=uuid,
-                                         access_log_id="9DA61402-A1CB-7041-A629-6191494C5767",
+            for i in range(1000):
+                # 新建一个plot_result
+                plot_result = PlotResult(plot_result_id=uuid.uuid4(),
+                                         access_log_id=access_log_id,
                                          plot_result_finish_date_time=date_time_now,
                                          plot_result_finish_state=1,
-                                         plot_result_local_path="/tmp/test/temp_plot/test_result{0}".format(index),
+                                         plot_result_local_path="/tmp/test/temp_plot/test_result",
                                          plot_result_upload_date_time=date_time_now,
                                          plot_result_upload_state=1,
                                          plot_result_url="test_example_url")
 
-                exc_result = prd.insert_exc(plot_result)
+                # 将这条plot_result信息插入数据库
+                exec_affect_row = prd.insert_one_exc(plot_result)
+                affect_row += exec_affect_row
 
-                effect_row += exc_result
+            self.assertEqual(affect_row, 1000)
 
-        self.assertEqual(effect_row, 10)
-
-    def test_c_multi_select(self):
+    def test_c_select_list_exc_by_access_id(self):
+        """
+        多条查询测试，查询test_b中插入的1000条数据
+        """
+        # 新建plot_result
         access_log_id = "9DA61402-A1CB-7041-A629-6191494C5767"
         plot_result = PlotResult(access_log_id=access_log_id)
 
@@ -156,15 +191,30 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         for result in result_list:
             print(result.plot_result_local_path, end=',')
 
-        self.assertEqual(len(result_list), 11)
+        self.assertEqual(len(result_list), 1000)
 
-    def test_d_delete(self):
-        plot_result_id = '9DA61402-A1CB-7041-A629-6191494C57D1'
-        plot_result = PlotResult(plot_result_id=plot_result_id)
+    def test_d_insert_one_exc_and_delete_one_exc_by_id(self):
+        """
+        单条插入 和 单条删除 测试
+        """
+        # 生成并插入一个plot_result
+        plot_result = PlotResult(plot_result_id=uuid.uuid4(),
+                                 access_log_id=uuid.uuid4(),
+                                 plot_result_finish_date_time=date_time_now,
+                                 plot_result_finish_state=1,
+                                 plot_result_local_path="/tmp/test/temp_plot/test_result",
+                                 plot_result_upload_date_time=date_time_now,
+                                 plot_result_upload_state=1,
+                                 plot_result_url="test_example_url")
 
         with PlotResultDao() as prd:
-            prd.delete_exc(plot_result)
+            prd.insert_one_exc(plot_result)
 
+        # 删除这条记录
+        with PlotResultDao() as prd:
+            prd.delete_one_exc_by_id(plot_result)
+
+        # 最后查询这条记录
         with PlotResultDao() as prd:
             result = prd.select_one_exc_by_id(plot_result)
 

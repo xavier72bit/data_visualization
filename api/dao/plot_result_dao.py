@@ -1,3 +1,4 @@
+from typing import List
 from utils import logging_util
 from pymysql.cursors import DictCursor
 from api.domain.plot_result import PlotResult
@@ -53,7 +54,13 @@ class PlotResultDao:
         plot_result_dao_logger.info("关闭MySQL连接: {0}".format(self._mysql_connection))
         self._mysql_connection.close()
 
-    def insert_exc(self, plot_result: PlotResult):
+    def insert_one_exc(self, plot_result: PlotResult) -> int:
+        """
+        单条INSERT操作
+
+        :return: 操作影响行数（该返回值仅为测试用例test_dao中的effect_row变量服务）
+        :rtype: int
+        """
         insert_sql = 'INSERT INTO plot_result (plot_result_id, access_log_id, plot_result_finish_date_time, plot_result_finish_state, plot_result_local_path, plot_result_upload_date_time, plot_result_upload_state, plot_result_url) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
         params = (plot_result.plot_result_id,
                   plot_result.access_log_id,
@@ -64,15 +71,43 @@ class PlotResultDao:
                   plot_result.plot_result_upload_state,
                   plot_result.plot_result_url)
 
-        return self._execute_cursor.execute(insert_sql, params)
+        try:
+            result = self._execute_cursor.execute(insert_sql, params)
+        except Exception as err:
+            plot_result_dao_logger.error("单条INSERT操作执行失败，错误原因: {0}".format(err))
+            result = 0
+        else:
+            plot_result_dao_logger.info("单条INSERT操作已执行，受影响行数: {0}".format(result))
 
-    def delete_exc(self, plot_result: PlotResult):
+        return result
+
+    def delete_one_exc_by_id(self, plot_result: PlotResult) -> int:
+        """
+        根据plot_result_id，单条DELETE操作
+
+        :return: 操作影响行数（该返回值仅为测试用例test_dao中的effect_row变量服务）
+        :rtype: int
+        """
         delete_sql = 'DELETE FROM plot_result WHERE plot_result_id = %s'
         params = (plot_result.plot_result_id,)
 
-        return self._execute_cursor.execute(delete_sql, params)
+        try:
+            result = self._execute_cursor.execute(delete_sql, params)
+        except Exception as err:
+            plot_result_dao_logger.error("根据plot_result_id单条DELETE操作执行失败，错误原因: {0}".format(err))
+            result = 0
+        else:
+            plot_result_dao_logger.info("根据plot_result_id单条DELETE操作已执行，受影响行数: {0}".format(result))
 
-    def update_exc(self, plot_result: PlotResult):
+        return result
+
+    def update_one_exc_by_id(self, plot_result: PlotResult) -> int:
+        """
+        根据plot_result_id，单条UPDATE操作
+
+        :return: 操作影响行数（该返回值仅为测试用例test_dao中的effect_row变量服务）
+        :rtype: int
+        """
         update_sql = 'UPDATE plot_result SET access_log_id = %s, plot_result_finish_date_time = %s, plot_result_finish_state = %s, plot_result_local_path = %s, plot_result_upload_date_time = %s, plot_result_upload_state = %s, plot_result_url = %s WHERE plot_result_id = %s'
         params = (plot_result.access_log_id,
                   plot_result.plot_result_finish_date_time,
@@ -84,17 +119,29 @@ class PlotResultDao:
                   plot_result.plot_result_id,
                   plot_result.access_log_id)
 
-        return self._execute_cursor.execute(update_sql, params)
+        try:
+            result = self._execute_cursor.execute(update_sql, params)
+        except Exception as err:
+            plot_result_dao_logger.error("根据plot_result_id单条UPDATE操作执行失败，错误原因: {0}".format(err))
+            result = 0
+        else:
+            plot_result_dao_logger.info("根据根据plot_result_id单条UPDATE操作已执行，受影响行数: {0}".format(result))
 
-    def select_one_exc_by_id(self, plot_result: PlotResult):
+        return result
+
+    def select_one_exc_by_id(self, plot_result: PlotResult) -> PlotResult | None:
+        """
+        根据plot_result_id，单条SELECT操作
+        """
         select_one_by_id_sql = 'SELECT plot_result_id, access_log_id, plot_result_finish_date_time, plot_result_finish_state, plot_result_local_path, plot_result_upload_date_time, plot_result_upload_state, plot_result_url FROM plot_result WHERE plot_result_id = %s LIMIT 0, 1'
         params = (plot_result.plot_result_id,)
 
-        exc_result = self._execute_cursor.execute(select_one_by_id_sql, params)
+        result = self._execute_cursor.execute(select_one_by_id_sql, params)
 
-        if exc_result:
+        if result:
+            plot_result_dao_logger.info("根据plot_result_id，单条SELECT操作，查询到{0}条结果".format(result))
+
             try:
-                plot_result_dao_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
                 select_result = self._execute_cursor.fetchone()
                 plot_result_result = PlotResult(select_result['plot_result_id'],
                                                 select_result['access_log_id'],
@@ -109,20 +156,26 @@ class PlotResultDao:
                 return None
             else:
                 return plot_result_result
+
         else:
             plot_result_dao_logger.info("select_one_exc_by_id未查到任何结果")
             return None
 
-    def select_list_exc_by_access_log_id(self, plot_result: PlotResult):
+    def select_list_exc_by_access_log_id(self, plot_result: PlotResult) -> List[PlotResult] | None:
+        """
+        根据access_log_id，批量SELECT操作
+        """
         select_list_by_plot_task_id_sql = 'SELECT plot_result_id, access_log_id, plot_result_finish_date_time, plot_result_finish_state, plot_result_local_path, plot_result_upload_date_time, plot_result_upload_state, plot_result_url FROM plot_result WHERE access_log_id LIKE %s'
         params = (plot_result.access_log_id,)
 
-        exc_result = self._execute_cursor.execute(select_list_by_plot_task_id_sql, params)
-        plot_result_result_list = []
+        result = self._execute_cursor.execute(select_list_by_plot_task_id_sql, params)
 
-        if exc_result:
+        if result:
+            plot_result_dao_logger.info("根据access_token，批量SELECT操作，查询到{0}条结果".format(result))
+            plot_result_result_list = []
+
             try:
-                plot_result_dao_logger.info("select_list_exc_by_plot_task_id查询到{0}条结果".format(exc_result))
+                # 遍历查询到的所有row
                 for select_result in self._execute_cursor:
                     plot_result_result = PlotResult(select_result['plot_result_id'],
                                                     select_result['access_log_id'],
@@ -139,6 +192,7 @@ class PlotResultDao:
                 return None
             else:
                 return plot_result_result_list
+
         else:
             plot_result_dao_logger.info("select_list_exc_by_plot_task_id未查到任何结果")
             return None

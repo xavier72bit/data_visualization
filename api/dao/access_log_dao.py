@@ -53,9 +53,12 @@ class AccessLogDao:
         access_log_dao_logger.info("关闭MySQL连接: {0}".format(self._mysql_connection))
         self._mysql_connection.close()
 
-    def insert_one_exc(self, access_log: AccessLog) -> None:
+    def insert_one_exc(self, access_log: AccessLog) -> int:
         """
         单条INSERT操作
+
+        :return: 操作影响行数（该返回值仅为测试用例test_dao中的effect_row变量服务）
+        :rtype: int
         """
         insert_sql = 'INSERT INTO access_log (access_log_id, access_date_time, access_token, access_state, access_log_message) VALUES (%s, %s, %s, %s, %s)'
         params = (access_log.access_log_id,
@@ -68,12 +71,18 @@ class AccessLogDao:
             result = self._execute_cursor.execute(insert_sql, params)
         except Exception as err:
             access_log_dao_logger.error("单条INSERT操作执行失败，错误原因: {0}".format(err))
+            result = 0
         else:
             access_log_dao_logger.info("单条INSERT操作已执行，受影响行数: {0}".format(result))
 
-    def delete_one_exc_by_id(self, access_log: AccessLog) -> None:
+        return result
+
+    def delete_one_exc_by_id(self, access_log: AccessLog) -> int:
         """
         根据access_log_id，单条DELETE操作
+
+        :return: 操作影响行数（该返回值仅为测试用例test_dao中的effect_row变量服务）
+        :rtype: int
         """
         delete_sql = 'DELETE FROM access_log WHERE access_log_id = %s'
         params = (access_log.access_log_id,)
@@ -82,12 +91,18 @@ class AccessLogDao:
             result = self._execute_cursor.execute(delete_sql, params)
         except Exception as err:
             access_log_dao_logger.error("根据access_log_id单条DELETE操作执行失败，错误原因: {0}".format(err))
+            result = 0
         else:
             access_log_dao_logger.info("根据access_log_id单条DELETE操作已执行，受影响行数: {0}".format(result))
 
-    def update_one_exc_by_id(self, access_log: AccessLog) -> None:
+        return result
+
+    def update_one_exc_by_id(self, access_log: AccessLog) -> int:
         """
         根据access_log_id，单条UPDATE操作
+
+        :return: 操作影响行数（该返回值仅为测试用例test_dao中的effect_row变量服务）
+        :rtype: int
         """
         update_sql = 'UPDATE access_log SET access_date_time = %s, access_token = %s, access_state = %s, access_log_message = %s WHERE access_log_id = %s'
         params = (access_log.access_date_time,
@@ -100,8 +115,11 @@ class AccessLogDao:
             result = self._execute_cursor.execute(update_sql, params)
         except Exception as err:
             access_log_dao_logger.error("根据access_log_id单条UPDATE操作执行失败，错误原因: {0}".format(err))
+            result = 0
         else:
             access_log_dao_logger.info("根据access_log_id单条UPDATE操作已执行，受影响行数: {0}".format(result))
+
+        return result
 
     def select_one_exc_by_id(self, access_log: AccessLog) -> AccessLog | None:
         """

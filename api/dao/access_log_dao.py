@@ -1,3 +1,4 @@
+from typing import List
 from utils import logging_util
 from pymysql.cursors import DictCursor
 from api.domain.access_log import AccessLog
@@ -52,7 +53,10 @@ class AccessLogDao:
         access_log_dao_logger.info("关闭MySQL连接: {0}".format(self._mysql_connection))
         self._mysql_connection.close()
 
-    def insert_exc(self, access_log: AccessLog):
+    def insert_one_exc(self, access_log: AccessLog) -> None:
+        """
+        单条INSERT操作
+        """
         insert_sql = 'INSERT INTO access_log (access_log_id, access_date_time, access_token, access_state, access_log_message) VALUES (%s, %s, %s, %s, %s)'
         params = (access_log.access_log_id,
                   access_log.access_date_time,
@@ -60,15 +64,31 @@ class AccessLogDao:
                   access_log.access_state,
                   access_log.access_log_message)
 
-        return self._execute_cursor.execute(insert_sql, params)
+        try:
+            result = self._execute_cursor.execute(insert_sql, params)
+        except Exception as err:
+            access_log_dao_logger.error("单条INSERT操作执行失败，错误原因: {0}".format(err))
+        else:
+            access_log_dao_logger.info("单条INSERT操作已执行，受影响行数: {0}".format(result))
 
-    def delete_exc(self, access_log: AccessLog):
+    def delete_one_exc_by_id(self, access_log: AccessLog) -> None:
+        """
+        根据access_log_id，单条DELETE操作
+        """
         delete_sql = 'DELETE FROM access_log WHERE access_log_id = %s'
         params = (access_log.access_log_id,)
 
-        return self._execute_cursor.execute(delete_sql, params)
+        try:
+            result = self._execute_cursor.execute(delete_sql, params)
+        except Exception as err:
+            access_log_dao_logger.error("根据access_log_id单条DELETE操作执行失败，错误原因: {0}".format(err))
+        else:
+            access_log_dao_logger.info("根据access_log_id单条DELETE操作已执行，受影响行数: {0}".format(result))
 
-    def update_exc(self, access_log: AccessLog):
+    def update_one_exc_by_id(self, access_log: AccessLog) -> None:
+        """
+        根据access_log_id，单条UPDATE操作
+        """
         update_sql = 'UPDATE access_log SET access_date_time = %s, access_token = %s, access_state = %s, access_log_message = %s WHERE access_log_id = %s'
         params = (access_log.access_date_time,
                   access_log.access_token,
@@ -76,17 +96,26 @@ class AccessLogDao:
                   access_log.access_log_message,
                   access_log.access_log_id)
 
-        return self._execute_cursor.execute(update_sql, params)
+        try:
+            result = self._execute_cursor.execute(update_sql, params)
+        except Exception as err:
+            access_log_dao_logger.error("根据access_log_id单条UPDATE操作执行失败，错误原因: {0}".format(err))
+        else:
+            access_log_dao_logger.info("根据access_log_id单条UPDATE操作已执行，受影响行数: {0}".format(result))
 
-    def select_one_exc_by_id(self, access_log: AccessLog):
+    def select_one_exc_by_id(self, access_log: AccessLog) -> AccessLog | None:
+        """
+        根据access_log_id，单条SELECT操作
+        """
         select_one_by_id_sql = 'SELECT access_log_id, access_date_time, access_token, access_state, access_log_message FROM access_log WHERE access_log_id = %s LIMIT 0, 1'
         params = (access_log.access_log_id,)
 
-        exc_result = self._execute_cursor.execute(select_one_by_id_sql, params)
+        result = self._execute_cursor.execute(select_one_by_id_sql, params)
 
-        if exc_result:
+        if result:
+            access_log_dao_logger.info("根据access_log_id，单条SELECT操作，查询到{0}条结果".format(result))
+
             try:
-                access_log_dao_logger.info("select_one_exc_by_id查询到{0}条结果".format(exc_result))
                 select_result = self._execute_cursor.fetchone()
                 access_log_result = AccessLog(select_result['access_log_id'],
                                               select_result['access_date_time'],
@@ -98,20 +127,25 @@ class AccessLogDao:
                 return None
             else:
                 return access_log_result
+
         else:
-            access_log_dao_logger.info("select_one_exc_by_id未查到任何结果")
+            access_log_dao_logger.info("根据access_log_id，单条SELECT操作，未查到任何结果")
             return None
 
-    def select_list_exc_by_access_token(self, access_log: AccessLog):
+    def select_list_exc_by_access_token(self, access_log: AccessLog) -> List[AccessLog] | None:
+        """
+        根据access_token，批量SELECT操作
+        """
         select_list_by_access_token_sql = 'SELECT access_log_id, access_date_time, access_token, access_state, access_log_message FROM access_log WHERE access_token LIKE %s'
         params = (access_log.access_token,)
 
-        exc_result = self._execute_cursor.execute(select_list_by_access_token_sql, params)
-        access_log_result_list = []
+        result = self._execute_cursor.execute(select_list_by_access_token_sql, params)
 
-        if exc_result:
+        if result:
+            access_log_dao_logger.info("根据access_token，批量SELECT操作，查询到{0}条结果".format(result))
+            access_log_result_list = []
+
             try:
-                access_log_dao_logger.info("select_list_exc_by_access_token查询到{0}条结果".format(exc_result))
                 # 遍历查询到的所有row
                 for select_result in self._execute_cursor:
                     access_log_result = AccessLog(select_result['access_log_id'],
@@ -126,6 +160,7 @@ class AccessLogDao:
                 return None
             else:
                 return access_log_result_list
+
         else:
-            access_log_dao_logger.info("select_list_exc_by_access_token未查到任何结果")
+            access_log_dao_logger.info("根据access_token，批量SELECT操作，未查到任何结果")
             return None

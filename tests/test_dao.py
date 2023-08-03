@@ -35,7 +35,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
 
         # 将这个AccessLog对象信息插入数据库
         with AccessLogDao() as access_log_dao:
-            access_log_dao.insert_exc(access_log)
+            access_log_dao.insert_one_exc(access_log)
 
         # 验证过程，另外开启一个连接，查询刚刚插入的信息
         with AccessLogDao() as access_log_dao:
@@ -59,7 +59,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
                                        0,
                                        "This is a test")
 
-                exc_result = access_log_dao.insert_exc(access_log)
+                exc_result = access_log_dao.insert_one_exc(access_log)
 
                 effect_row += exc_result
 
@@ -84,7 +84,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         access_log = AccessLog(access_log_id=access_log_id)
 
         with AccessLogDao() as access_log_dao:
-            access_log_dao.delete_exc(access_log)
+            access_log_dao.delete_one_exc_by_id(access_log)
 
         with AccessLogDao() as access_log_dao:
             result = access_log_dao.select_one_exc_by_id(access_log)

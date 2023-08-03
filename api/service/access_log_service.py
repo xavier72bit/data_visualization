@@ -22,7 +22,7 @@ def creat_a_new_access_log(access_token, access_log_message) -> str:
 
     # 将条目插入数据库
     with AccessLogDao() as ald:
-        ald.insert_exc(new_access_log)
+        ald.insert_one_exc(new_access_log)
 
     return new_access_log.access_log_id
 

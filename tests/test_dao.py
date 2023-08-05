@@ -2,10 +2,10 @@ import uuid
 import datetime
 import unittest
 
-from api.domain.access_log import AccessLog
-from api.domain.plot_result import PlotResult
-from api.dao.access_log_dao import AccessLogDao
-from api.dao.plot_result_dao import PlotResultDao
+from data_visualization.domain.access_log import AccessLog
+from data_visualization.domain.plot_result import PlotResult
+from data_visualization.dao.access_log_dao import AccessLogDao
+from data_visualization.dao.plot_result_dao import PlotResultDao
 
 date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 

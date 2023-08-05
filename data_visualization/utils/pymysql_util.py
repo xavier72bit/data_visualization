@@ -1,5 +1,5 @@
 import pymysql
-from utils import config_util, logging_util
+from data_visualization.utils import config_util, logging_util
 from dbutils.pooled_db import PooledDB
 
 __all__ = ["connection_pool"]

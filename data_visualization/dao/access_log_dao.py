@@ -1,8 +1,8 @@
 from typing import List
-from utils import logging_util
+from data_visualization.utils import logging_util
 from pymysql.cursors import DictCursor
-from api.domain.access_log import AccessLog
-from utils.pymysql_util import connection_pool
+from data_visualization.domain.access_log import AccessLog
+from data_visualization.utils.pymysql_util import connection_pool
 
 __all__ = ["AccessLogDao"]
 

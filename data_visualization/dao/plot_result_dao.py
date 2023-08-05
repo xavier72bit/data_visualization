@@ -1,8 +1,8 @@
 from typing import List
-from utils import logging_util
+from data_visualization.utils import logging_util
 from pymysql.cursors import DictCursor
-from api.domain.plot_result import PlotResult
-from utils.pymysql_util import connection_pool
+from data_visualization.domain.plot_result import PlotResult
+from data_visualization.utils.pymysql_util import connection_pool
 
 __all__ = ["PlotResultDao"]
 

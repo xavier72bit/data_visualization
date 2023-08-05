@@ -1,7 +1,7 @@
 import flask
-from utils import config_util, logging_util
+from data_visualization.utils import config_util, logging_util
 from flask import Flask
-from utils.pymysql_util import MysqlConnection
+from data_visualization.utils.pymysql_util import MysqlConnection
 
 
 # -----------------------------------------------------

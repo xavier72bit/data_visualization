@@ -1,13 +1,11 @@
 import uuid
-import datetime
 from typing import List
 
+from project_common import DATE_TIME_NOW
 from data_visualization.domain.access_log import AccessLog
 from data_visualization.dao.access_log_dao import AccessLogDao
 
-__all__ = ["creat_a_new_access_log"]
-
-date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+__all__ = ["creat_a_new_access_log", "read_a_access_log_by_id", "read_access_list_by_token"]
 
 
 def creat_a_new_access_log(access_token: str, access_log_message: str) -> str:
@@ -18,7 +16,7 @@ def creat_a_new_access_log(access_token: str, access_log_message: str) -> str:
     :rtype: str
     """
     new_access_log = AccessLog(access_log_id=uuid.uuid4(),
-                               access_date_time=date_time_now,
+                               access_date_time=DATE_TIME_NOW,
                                access_token=access_token,
                                access_log_message=access_log_message)
 

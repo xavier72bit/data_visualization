@@ -1,12 +1,13 @@
 import yaml
 import os.path
+
 from project_common import CURRENT_CONFIG_PATH
 
 __all__ = ['read_yaml']
 
 
 # -----------------------------------------------------
-# 读取配置文件并将其转换为字典
+# 配置模块的工具函数
 # -----------------------------------------------------
 
 def read_yaml(yaml_file_name: str) -> dict:

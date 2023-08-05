@@ -1,7 +1,9 @@
 import os.path
 import logging
+
 from project_common import CURRENT_LOG_PATH
 from flask.logging import default_handler as flask_default_handler
+
 
 __all__ = ["create_file_handler", "std_init_module_logging"]
 

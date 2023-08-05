@@ -1,6 +1,7 @@
 from typing import List
-from data_visualization.utils import logging_util
 from pymysql.cursors import DictCursor
+
+from data_visualization.utils import logging_util
 from data_visualization.domain.plot_result import PlotResult
 from data_visualization.utils.pymysql_util import connection_pool
 

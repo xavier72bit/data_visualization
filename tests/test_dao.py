@@ -1,13 +1,11 @@
 import uuid
-import datetime
 import unittest
 
+from project_common import DATE_TIME_NOW
 from data_visualization.domain.access_log import AccessLog
 from data_visualization.domain.plot_result import PlotResult
 from data_visualization.dao.access_log_dao import AccessLogDao
 from data_visualization.dao.plot_result_dao import PlotResultDao
-
-date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 class AccessLogDaoBaseTest(unittest.TestCase):
@@ -20,7 +18,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         """
         # 新建一个access_log
         access_log = AccessLog(uuid.uuid4(),
-                               date_time_now,
+                               DATE_TIME_NOW,
                                "test_token_from_test_a",
                                0,
                                "This is a test")
@@ -50,7 +48,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
             for i in range(1000):
                 # 新建一个access_log
                 access_log = AccessLog(uuid.uuid4(),
-                                       date_time_now,
+                                       DATE_TIME_NOW,
                                        "test_token_from_test_b",
                                        0,
                                        "This is a test{0}".format(i))
@@ -86,7 +84,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
 
         # 生成并插入一个access_log
         access_log = AccessLog(uuid.uuid4(),
-                               date_time_now,
+                               DATE_TIME_NOW,
                                "test_token_from_test_c",
                                0,
                                "This is a test")
@@ -117,10 +115,10 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         # 手动生成一个plot_result
         plot_result = PlotResult(plot_result_id=uuid.uuid4(),
                                  access_log_id=uuid.uuid4(),
-                                 plot_result_finish_date_time=date_time_now,
+                                 plot_result_finish_date_time=DATE_TIME_NOW,
                                  plot_result_finish_state=1,
                                  plot_result_local_path="/tmp/test/temp_plot/test_result",
-                                 plot_result_upload_date_time=date_time_now,
+                                 plot_result_upload_date_time=DATE_TIME_NOW,
                                  plot_result_upload_state=1,
                                  plot_result_url="test_example_url")
 
@@ -162,10 +160,10 @@ class PlotResultDaoBaseTest(unittest.TestCase):
                 # 新建一个plot_result
                 plot_result = PlotResult(plot_result_id=uuid.uuid4(),
                                          access_log_id=access_log_id,
-                                         plot_result_finish_date_time=date_time_now,
+                                         plot_result_finish_date_time=DATE_TIME_NOW,
                                          plot_result_finish_state=1,
                                          plot_result_local_path="/tmp/test/temp_plot/test_result",
-                                         plot_result_upload_date_time=date_time_now,
+                                         plot_result_upload_date_time=DATE_TIME_NOW,
                                          plot_result_upload_state=1,
                                          plot_result_url="test_example_url")
 
@@ -200,10 +198,10 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         # 生成并插入一个plot_result
         plot_result = PlotResult(plot_result_id=uuid.uuid4(),
                                  access_log_id=uuid.uuid4(),
-                                 plot_result_finish_date_time=date_time_now,
+                                 plot_result_finish_date_time=DATE_TIME_NOW,
                                  plot_result_finish_state=1,
                                  plot_result_local_path="/tmp/test/temp_plot/test_result",
-                                 plot_result_upload_date_time=date_time_now,
+                                 plot_result_upload_date_time=DATE_TIME_NOW,
                                  plot_result_upload_state=1,
                                  plot_result_url="test_example_url")
 

@@ -1,9 +1,7 @@
 import unittest
-import datetime
 
+from project_common import DATE_TIME_NOW
 from data_visualization.service import access_log_service
-
-date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 class AccessLogServiceTest(unittest.TestCase):

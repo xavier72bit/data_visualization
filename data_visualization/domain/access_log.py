@@ -1,11 +1,18 @@
+from data_visualization.domain import DomainInterface
+
+
 __all__ = ["AccessLog"]
 
 
-class AccessLog:
+class AccessLog(DomainInterface):
     """
     access_log表的数据对象
     """
-    __slots__ = ['access_log_id', 'access_date_time', 'access_token', 'access_state', 'access_log_message']
+    __slots__ = ['access_log_id',
+                 'access_date_time',
+                 'access_token',
+                 'access_state',
+                 'access_log_message']
 
     def __init__(self,
                  access_log_id=None,

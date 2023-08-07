@@ -1,7 +1,10 @@
+from data_visualization.domain import DomainInterface
+
+
 __all__ = ["PlotResult"]
 
 
-class PlotResult:
+class PlotResult(DomainInterface):
     """
     plot_result表的数据对象
     """

@@ -10,13 +10,13 @@ app_server:
 ## 数据库连接池配置
 database_connection_pool:
   # 数据库ip地址
-  host: "192.168.64.16"
+  host: "127.0.0.1"
   # 库名
   db: "data_visualization"
   # 用户名
   user: "data_visualization"
   # 密码
-  password: "123456"
+  password: "data_visualization"
   # 数据库端口
   port: 3306
   # 字符编码

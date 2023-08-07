@@ -50,11 +50,21 @@
 
 ### 项目遗留搁置问题：
 
-1. 要为每一个 以面向对象设计 的python软件包 建立一个通用的interface。这个interface可以考虑写到__init__.py里（先要弄清楚__init__.py文件是干什么的）  
-这个搁置问题的起因是：data_visualization.dao.plot_result_dao中的TODO。
+~~1. 要为每一个 以面向对象设计 的python软件包 建立一个通用的interface。这个interface可以考虑写到__init__.py里（先要弄清楚__init__.py文件是干什么的）  
+这个搁置问题的起因是：data_visualization.dao.plot_result_dao中的TODO。~~（已完成 2023.08.07）
 
 ### 资料准备
 
 [flask应用错误处理](https://dormousehole.readthedocs.io/en/latest/errorhandling.html)
 
 [flask蓝图](https://dormousehole.readthedocs.io/en/latest/blueprints.html)
+
+## 2023.08.07
+
+已完成dao层与domain层的重构。
+
+接下来，如果想修改数据库表的字段，会简单很多：
+* **之前**：改dao层每一个方法的sql语句（最繁琐的在这里），改domain数据对象的`__slots__`、`__init__`
+* **现在**：改domain数据对象的`__slots__`、`__init__`即可
+
+全面开始开发api层

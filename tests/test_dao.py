@@ -45,11 +45,12 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         affect_row = 0
 
         with AccessLogDao() as ald:
+            access_token = "test_token_from_test_b" + DATE_TIME_NOW
             for i in range(1000):
                 # 新建一个access_log
                 access_log = AccessLog(uuid.uuid4(),
                                        DATE_TIME_NOW,
-                                       "test_token_from_test_b",
+                                       access_token,
                                        0,
                                        "This is a test{0}".format(i))
 
@@ -64,7 +65,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         多条查询测试，查询test_b中插入的1000条数据
         """
         # 新建access_log
-        access_token = "test_token_from_test_b"
+        access_token = "test_token_from_test_b" + DATE_TIME_NOW
         access_log = AccessLog(access_token=access_token)
 
         with AccessLogDao() as ald:

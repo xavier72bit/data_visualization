@@ -36,7 +36,7 @@ def read_a_access_log_by_id(access_log_id: str) -> AccessLog:
     access_log = AccessLog(access_log_id=access_log_id)
 
     with AccessLogDao() as ald:
-        access_log = ald.select_one_exc_by_id(access_log)
+        access_log = ald.select_one_exc_by_pk(access_log)
 
     return access_log
 
@@ -51,6 +51,6 @@ def read_access_list_by_token(access_token: str) -> List[AccessLog]:
     access_log = AccessLog(access_token=access_token)
 
     with AccessLogDao() as ald:
-        access_log_list = ald.select_list_exc_by_access_token(access_log)
+        access_log_list = ald.select_list_exc_by_column_name(access_log)
 
     return access_log_list

@@ -17,11 +17,12 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         单条插入 与 单条查询 测试
         """
         # 新建一个access_log
-        access_log = AccessLog(uuid.uuid4(),
+        access_log = AccessLog(str(uuid.uuid4()),
                                DATE_TIME_NOW,
                                "test_token_from_test_a",
                                0,
-                               "This is a test")
+                               "This is a test",
+                               "123.123.123.123")
 
         # 插入操作
         with AccessLogDao() as ald:
@@ -29,7 +30,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
 
         # 查询刚刚插入的信息
         with AccessLogDao() as ald:
-            new_access_log = ald.select_one_exc_by_id(access_log)
+            new_access_log = ald.select_one_exc_by_pk(access_log)
 
         print(new_access_log)
         self.assertEqual(str(access_log.access_log_id), str(new_access_log.access_log_id))
@@ -37,6 +38,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         self.assertEqual(access_log.access_token, new_access_log.access_token)
         self.assertEqual(access_log.access_state, new_access_log.access_state)
         self.assertEqual(access_log.access_log_message, new_access_log.access_log_message)
+        self.assertEqual(access_log.access_ip, new_access_log.access_ip)
 
     def test_b_multi_insert_one_exc(self):
         """
@@ -48,11 +50,12 @@ class AccessLogDaoBaseTest(unittest.TestCase):
             access_token = "test_token_from_test_b" + DATE_TIME_NOW
             for i in range(1000):
                 # 新建一个access_log
-                access_log = AccessLog(uuid.uuid4(),
+                access_log = AccessLog(str(uuid.uuid4()),
                                        DATE_TIME_NOW,
                                        access_token,
                                        0,
-                                       "This is a test{0}".format(i))
+                                       "This is a test{0}".format(i),
+                                       "123.123.123.124")
 
                 # 将这个access_log信息插入数据库
                 exec_affect_row = ald.insert_one_exc(access_log)
@@ -69,7 +72,7 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         access_log = AccessLog(access_token=access_token)
 
         with AccessLogDao() as ald:
-            result_list = ald.select_list_exc_by_access_token(access_log)
+            result_list = ald.select_list_exc_by_column_name(access_log, 'access_token')
 
         print(result_list)
 
@@ -84,11 +87,12 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         """
 
         # 生成并插入一个access_log
-        access_log = AccessLog(uuid.uuid4(),
+        access_log = AccessLog(str(uuid.uuid4()),
                                DATE_TIME_NOW,
                                "test_token_from_test_c",
                                0,
-                               "This is a test")
+                               "This is a test",
+                               "123.123.123.123")
 
         with AccessLogDao() as ald:
             ald.insert_one_exc(access_log)
@@ -99,9 +103,25 @@ class AccessLogDaoBaseTest(unittest.TestCase):
 
         # 最后查询这条记录
         with AccessLogDao() as ald:
-            result = ald.select_one_exc_by_id(access_log)
+            result = ald.select_one_exc_by_pk(access_log)
 
         self.assertIsNone(result)
+
+    def test_e_select_list_exc_by_access_ip(self):
+        """
+        多条查询测试，查询test_b中插入的1000条数据
+        """
+        access_log = AccessLog(access_ip='123.123.123.124')
+
+        with AccessLogDao() as ald:
+            result_list = ald.select_list_exc_by_column_name(access_log, 'access_ip')
+
+        print(result_list)
+
+        for result in result_list:
+            print(result.access_log_id, end=',')
+
+        self.assertEqual(len(result_list), 1000)
 
 
 class PlotResultDaoBaseTest(unittest.TestCase):
@@ -114,8 +134,8 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         单条插入 与 单条查询 测试
         """
         # 手动生成一个plot_result
-        plot_result = PlotResult(plot_result_id=uuid.uuid4(),
-                                 access_log_id=uuid.uuid4(),
+        plot_result = PlotResult(plot_result_id=str(uuid.uuid4()),
+                                 access_log_id=str(uuid.uuid4()),
                                  plot_result_finish_date_time=DATE_TIME_NOW,
                                  plot_result_finish_state=1,
                                  plot_result_local_path="/tmp/test/temp_plot/test_result",
@@ -129,7 +149,7 @@ class PlotResultDaoBaseTest(unittest.TestCase):
 
         # 查询刚生成的这条plot_result
         with PlotResultDao() as prd:
-            new_plot_result = prd.select_one_exc_by_id(plot_result)
+            new_plot_result = prd.select_one_exc_by_pk(plot_result)
 
         print(new_plot_result)
         self.assertEqual(str(plot_result.plot_result_id),
@@ -159,7 +179,7 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         with PlotResultDao() as prd:
             for i in range(1000):
                 # 新建一个plot_result
-                plot_result = PlotResult(plot_result_id=uuid.uuid4(),
+                plot_result = PlotResult(plot_result_id=str(uuid.uuid4()),
                                          access_log_id=access_log_id,
                                          plot_result_finish_date_time=DATE_TIME_NOW,
                                          plot_result_finish_state=1,
@@ -183,7 +203,7 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         plot_result = PlotResult(access_log_id=access_log_id)
 
         with PlotResultDao() as prd:
-            result_list = prd.select_list_exc_by_access_log_id(plot_result)
+            result_list = prd.select_list_exc_by_column_name(plot_result, 'access_log_id')
 
         print(result_list)
 
@@ -197,8 +217,8 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         单条插入 和 单条删除 测试
         """
         # 生成并插入一个plot_result
-        plot_result = PlotResult(plot_result_id=uuid.uuid4(),
-                                 access_log_id=uuid.uuid4(),
+        plot_result = PlotResult(plot_result_id=str(uuid.uuid4()),
+                                 access_log_id=str(uuid.uuid4()),
                                  plot_result_finish_date_time=DATE_TIME_NOW,
                                  plot_result_finish_state=1,
                                  plot_result_local_path="/tmp/test/temp_plot/test_result",
@@ -211,11 +231,11 @@ class PlotResultDaoBaseTest(unittest.TestCase):
 
         # 删除这条记录
         with PlotResultDao() as prd:
-            prd.delete_one_exc_by_id(plot_result)
+            prd.delete_one_exc(plot_result)
 
         # 最后查询这条记录
         with PlotResultDao() as prd:
-            result = prd.select_one_exc_by_id(plot_result)
+            result = prd.select_one_exc_by_pk(plot_result)
 
         self.assertIsNone(result)
 

@@ -9,16 +9,9 @@ from data_visualization.utils.pymysql_util import connection_pool
 """
 data_visualization.dao 软件包的说明：
 
-该软件包为dao层功能代码。
-
-Dao：
-对数据库进行数据持久化操作，它的方法语句是直接针对数据库操作的，
-主要实现一些数据的增删改查。核心思想是把数据库封装一下，
-让与数据库的交道看起来像在和一个对象打交道，这个对象通常就是DAO。
-
 在本项目中，DAO层的职责：
 1. 维护数据库连接的开启与关闭
-2. 维护业务所需的sql（Dao类的属性）
+2. 维护业务所需的sql
 3. 执行sql，返回执行结果，记录执行日志（Dao类的方法）
 
 __init__.py提供：

@@ -1,6 +1,5 @@
 import unittest
 
-from project_common import DATE_TIME_NOW
 from data_visualization.service import access_log_service
 
 

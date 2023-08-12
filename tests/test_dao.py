@@ -48,14 +48,14 @@ class AccessLogDaoBaseTest(unittest.TestCase):
 
         with AccessLogDao() as ald:
             access_token = "test_token_from_test_b" + DATE_TIME_NOW
-            for i in range(1000):
+            for i in range(5423):
                 # 新建一个access_log
                 access_log = AccessLog(str(uuid.uuid4()),
                                        DATE_TIME_NOW,
                                        access_token,
                                        0,
                                        "This is a test{0}".format(i),
-                                       "123.123.123.124")
+                                       "127.0.0.1")
 
                 # 将这个access_log信息插入数据库
                 exec_affect_row = ald.insert_one_exc(access_log)

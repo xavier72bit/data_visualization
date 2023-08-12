@@ -192,7 +192,7 @@ class SqlParamGenerator:
         return value_list
 
 
-class DaoInterface(metaclass=ABCMeta):
+class DaoInterface:
     """
     dao层 所有Dao类的统一规范接口，此类禁止实例化。
     此类定义了：

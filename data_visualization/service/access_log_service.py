@@ -15,7 +15,7 @@ def creat_a_new_access_log(access_token: str, access_log_message: str) -> str:
     :return: access_log_id
     :rtype: str
     """
-    new_access_log = AccessLog(access_log_id=uuid.uuid4(),
+    new_access_log = AccessLog(access_log_id=str(uuid.uuid4()),
                                access_date_time=DATE_TIME_NOW,
                                access_token=access_token,
                                access_log_message=access_log_message)
@@ -29,9 +29,6 @@ def creat_a_new_access_log(access_token: str, access_log_message: str) -> str:
 def read_a_access_log_by_id(access_log_id: str) -> AccessLog:
     """
     根据access_log_id，读取一条access_log
-
-    :return: access_log
-    :rtype: AccessLog
     """
     access_log = AccessLog(access_log_id=access_log_id)
 
@@ -44,13 +41,22 @@ def read_a_access_log_by_id(access_log_id: str) -> AccessLog:
 def read_access_list_by_token(access_token: str) -> List[AccessLog]:
     """
     根据access_token，读取access_log列表
-
-    :return: access_log_list
-    :rtype: List[AccessLog]
     """
     access_log = AccessLog(access_token=access_token)
 
     with AccessLogDao() as ald:
-        access_log_list = ald.select_list_exc_by_column_name(access_log)
+        access_log_list = ald.select_list_exc_by_column_name(access_log, "access_token")
 
     return access_log_list
+
+
+def read_access_count_by_ip(access_ip: str) -> int:
+    """
+    根据access_ip，读取access_log列表
+    """
+    access_log = AccessLog(access_ip=access_ip)
+
+    with AccessLogDao() as ald:
+        access_log_list = ald.select_list_exc_by_column_name(access_log, "access_ip")
+
+    return len(access_log_list)

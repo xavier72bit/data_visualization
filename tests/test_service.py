@@ -18,3 +18,7 @@ class AccessLogServiceTest(unittest.TestCase):
         access_log = access_log_service.read_a_access_log_by_id(access_log_id)
 
         self.assertEqual(str(access_log_id), str(access_log.access_log_id))
+
+
+if __name__ == '__main__':
+    unittest.main()

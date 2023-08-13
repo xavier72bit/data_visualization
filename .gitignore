@@ -4,3 +4,4 @@ venv
 __pycache__
 tests/logs
 logs
+plot_output

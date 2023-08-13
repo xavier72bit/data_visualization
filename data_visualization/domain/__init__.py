@@ -27,6 +27,6 @@ class DomainInterface(metaclass=ABCMeta):
         return cls.__slots__
 
 
-# TODO: Domain类型检查支持
+# TODO: Domain类型检查支持，将所有类型全部移动到project_common模块下！
 class DomainType:
     pass

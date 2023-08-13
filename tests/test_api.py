@@ -14,3 +14,7 @@ class SysinfoTest(unittest.TestCase):
         print(r)
 
         self.assertEqual(r.text, 3000)
+
+
+if __name__ == '__main__':
+    unittest.main()

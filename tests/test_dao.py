@@ -20,7 +20,6 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         access_log = AccessLog(str(uuid.uuid4()),
                                DATE_TIME_NOW,
                                "test_token_from_test_a",
-                               0,
                                "This is a test",
                                "123.123.123.123")
 
@@ -36,7 +35,6 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         self.assertEqual(str(access_log.access_log_id), str(new_access_log.access_log_id))
         self.assertEqual(access_log.access_date_time, new_access_log.access_date_time.strftime("%Y-%m-%d %H:%M:%S"))
         self.assertEqual(access_log.access_token, new_access_log.access_token)
-        self.assertEqual(access_log.access_state, new_access_log.access_state)
         self.assertEqual(access_log.access_log_message, new_access_log.access_log_message)
         self.assertEqual(access_log.access_ip, new_access_log.access_ip)
 
@@ -53,7 +51,6 @@ class AccessLogDaoBaseTest(unittest.TestCase):
                 access_log = AccessLog(str(uuid.uuid4()),
                                        DATE_TIME_NOW,
                                        access_token,
-                                       0,
                                        "This is a test{0}".format(i),
                                        "127.0.0.1")
 
@@ -90,7 +87,6 @@ class AccessLogDaoBaseTest(unittest.TestCase):
         access_log = AccessLog(str(uuid.uuid4()),
                                DATE_TIME_NOW,
                                "test_token_from_test_c",
-                               0,
                                "This is a test",
                                "123.123.123.123")
 

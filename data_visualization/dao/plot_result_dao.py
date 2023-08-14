@@ -2,8 +2,8 @@ from typing import List
 
 from data_visualization.dao import DaoInterface
 from data_visualization.utils import logging_util
-from data_visualization.dao import BasicSqlGenerator, SqlParamGenerator
 from data_visualization.domain.plot_result import PlotResult
+from data_visualization.dao import BasicSqlGenerator, SqlParamGenerator
 
 __all__ = ["PlotResultDao"]
 
@@ -58,7 +58,7 @@ class PlotResultDao(DaoInterface):
 
     def delete_one_exc(self, plot_result: PlotResult) -> int:
         """
-        根据access_log_id，单条DELETE操作
+        根据plot_result_id，单条DELETE操作
 
         :return: 操作影响行数（该返回值仅为测试用例test_dao中的effect_row变量服务）
         :rtype: int
@@ -69,16 +69,16 @@ class PlotResultDao(DaoInterface):
         try:
             result = self._execute_cursor.execute(delete_sql, sql_params)
         except Exception as err:
-            self._logger.error("根据access_log_id单条DELETE操作执行失败，错误原因: {0}".format(err))
+            self._logger.error("根据plot_result_id单条DELETE操作执行失败，错误原因: {0}".format(err))
             result = 0
         else:
-            self._logger.info("根据access_log_id单条DELETE操作已执行，受影响行数: {0}".format(result))
+            self._logger.info("根据plot_result_id单条DELETE操作已执行，受影响行数: {0}".format(result))
 
         return result
 
     def update_one_exc(self, plot_result: PlotResult) -> int:
         """
-        根据access_log_id，单条UPDATE操作
+        根据plot_result_id，单条UPDATE操作
 
         :return: 操作影响行数（该返回值仅为测试用例test_dao中的effect_row变量服务）
         :rtype: int
@@ -89,10 +89,10 @@ class PlotResultDao(DaoInterface):
         try:
             result = self._execute_cursor.execute(update_sql, sql_params)
         except Exception as err:
-            self._logger.error("根据access_log_id单条UPDATE操作执行失败，错误原因: {0}".format(err))
+            self._logger.error("根据plot_result_id单条UPDATE操作执行失败，错误原因: {0}".format(err))
             result = 0
         else:
-            self._logger.info("根据access_log_id单条UPDATE操作已执行，受影响行数: {0}".format(result))
+            self._logger.info("根据plot_result_id单条UPDATE操作已执行，受影响行数: {0}".format(result))
 
         return result
 
@@ -110,15 +110,15 @@ class PlotResultDao(DaoInterface):
 
             try:
                 select_result = self._execute_cursor.fetchone()
-                access_log_result = PlotResult(**select_result)
+                plot_result_result = PlotResult(**select_result)
             except Exception as select_exc_err:
                 self._logger.warning("row转换为数据对象失败, {0}".format(select_exc_err))
                 return None
             else:
-                return access_log_result
+                return plot_result_result
 
         else:
-            self._logger.info("根据access_log_id，单条SELECT操作，未查到任何结果")
+            self._logger.info("根据plot_result_id，单条SELECT操作，未查到任何结果")
             return None
 
     def select_list_exc_by_column_name(self, plot_result: PlotResult, column_name: str) -> List[PlotResult] | None:

@@ -1,10 +1,12 @@
-from abc import ABCMeta
 from typing import List
 from logging import Logger
 from itertools import repeat
 
 from pymysql.cursors import DictCursor
 from data_visualization.utils.pymysql_util import connection_pool
+
+__all__ = ['DaoInterface', 'BasicSqlGenerator', 'SqlParamGenerator',
+           'access_log_dao', 'plot_result_dao']
 
 """
 data_visualization.dao 软件包的说明：
@@ -32,6 +34,10 @@ __init__.py提供：
 5. 将 定义的Dao类 与 本模块的日志Logger 绑定
 """
 
+
+# -----------------------------------------------------
+# sql生成 工具类
+# -----------------------------------------------------
 
 class BasicSqlGenerator:
     """
@@ -128,6 +134,11 @@ class BasicSqlGenerator:
             return None
 
 
+# -----------------------------------------------------
+# 参数转换 工具类
+# -----------------------------------------------------
+
+
 class SqlParamGenerator:
     """
     将domain数据对象转化为列表
@@ -183,6 +194,11 @@ class SqlParamGenerator:
             self._logger.info("domain对象：{0}转化为{1}字段值列表：{2}".format(domain, column_name, value_list))
 
         return value_list
+
+
+# -----------------------------------------------------
+# 所有Dao类的通用父类
+# -----------------------------------------------------
 
 
 class DaoInterface:

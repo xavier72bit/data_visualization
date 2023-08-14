@@ -11,6 +11,10 @@ from data_visualization.utils import logging_util
 plotting_logger = logging_util.std_init_module_logging(__name__, 'DEBUG', '{0}.log'.format(__name__))
 
 
+# -----------------------------------------------------
+# 工具函数
+# -----------------------------------------------------
+
 def plot_storage(figure, file_name: str) -> str | int:
     """
     绘图结果存储

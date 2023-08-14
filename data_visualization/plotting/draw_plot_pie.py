@@ -1,12 +1,23 @@
 import matplotlib.pyplot as plt
 
-font = {'family': 'SimSun',
-        'size': '12'}
+# -----------------------------------------------------
+# 定义字体
+# -----------------------------------------------------
 
-plt.rc('font', **font)
+font_rc = {'family': 'SimSun',
+           'size': '12'}
 
+plt.rc('font', **font_rc)
+
+
+# -----------------------------------------------------
+# 绘图功能函数
+# -----------------------------------------------------
 
 def draw_catalog_num_pie(catalog_data_list, num_data_list, plot_title) -> plt.Figure:
+    """
+    绘制 类别-数字 饼状图
+    """
     fig, ax = plt.subplots()
 
     ax.set_title(plot_title)

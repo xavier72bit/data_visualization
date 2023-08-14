@@ -1,6 +1,19 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+# -----------------------------------------------------
+# 定义字体
+# -----------------------------------------------------
+
+font_rc = {'family': 'SimSun',
+           'size': '12'}
+
+plt.rc('font', **font_rc)
+
+
+# -----------------------------------------------------
+# 绘图功能函数
+# -----------------------------------------------------
 
 def draw_time_num_column(time_data_list, num_data_list, plot_title) -> plt.Figure:
     """

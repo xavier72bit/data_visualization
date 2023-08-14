@@ -1,0 +1,8 @@
+DBUtils==3.0.3
+Flask==2.3.2
+matplotlib==3.7.2
+numpy==1.25.2
+py3Fdfs==2.2.0
+PyMySQL==1.1.0
+PyYAML==6.0.1
+Requests==2.31.0

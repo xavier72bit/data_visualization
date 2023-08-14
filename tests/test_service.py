@@ -69,6 +69,22 @@ class PlotResultServiceTest(unittest.TestCase):
         # 获取url
         print(plot_result_service.read_url_by_id(plot_result_id))
 
+    def test_C_plot_time_num_error_1(self):
+        # 新建一个plot_result对象
+        plot_result = plot_result_service.create_a_new_plot_result('test_access_log_id')
+
+        # 绘图
+        plot_result_id = plot_result_service.plot_time_num(plot_result,
+                                                           self.time_data_list_short,
+                                                           [1, 2, 3, 4, 5, 6, 7],
+                                                           '接单量')
+
+        # 获取状态
+        print(plot_result_service.read_state_by_id(plot_result_id))
+
+        # 获取url
+        print(plot_result_service.read_url_by_id(plot_result_id))
+
 
 if __name__ == '__main__':
     unittest.main()

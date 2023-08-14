@@ -1,4 +1,3 @@
-from abc import ABCMeta
 from typing import List
 
 """
@@ -15,7 +14,7 @@ __init__.py提供：
 """
 
 
-class DomainInterface(metaclass=ABCMeta):
+class DomainInterface():
     # Domain数据对象的所有的属性都存在__slots__中
     __slots__ = []
 

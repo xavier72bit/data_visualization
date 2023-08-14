@@ -30,11 +30,22 @@ plot_result_finish_state 绘图结果状态：
 plot_result_service_logger = logging_util.std_init_module_logging(__name__, 'DEBUG', '{0}.log'.format(__name__))
 
 
+# -----------------------------------------------------
+# 功能函数
+# -----------------------------------------------------
+
+
 def create_a_new_plot_result(access_log_id):
     """
-    创建一个新的plot_result
+    创建一个新的plot_result，返回plot_result_id
     """
-    return PlotResult(plot_result_id=str(uuid.uuid4()), access_log_id=access_log_id)
+    plot_result = PlotResult(plot_result_id=str(uuid.uuid4()),
+                             access_log_id=access_log_id)
+
+    with PlotResultDao() as prd:
+        prd.insert_one_exc(plot_result)
+
+    return plot_result.plot_result_id
 
 
 def read_url_by_id(plot_result_id):
@@ -61,17 +72,21 @@ def read_state_by_id(plot_result_id):
     return plot_result.plot_result_state
 
 
-def plot_time_num(plot_result: PlotResult, time_data_list, num_data_list, plot_title):
+def plot_time_num(plot_result_id, time_data_list, num_data_list, plot_title):
     """
     绘制 时间-数字 类型的图表
     """
+    # 从数据库中查询这条plot_result记录
+    with PlotResultDao() as prd:
+        plot_result = prd.select_one_exc_by_pk(PlotResult(plot_result_id=plot_result_id))
+
     # 第一步，判断传入的两个列表长度是否一致
     if len(time_data_list) != len(num_data_list):
         plot_result.plot_result_state = 1
 
-        # 判断失败，落库，返回plot_result_id
+        # 第一步判断失败，更新记录，返回plot_result_id
         with PlotResultDao() as prd:
-            prd.insert_one_exc(plot_result)
+            prd.update_one_exc(plot_result)
 
         return plot_result.plot_result_id
 
@@ -87,9 +102,9 @@ def plot_time_num(plot_result: PlotResult, time_data_list, num_data_list, plot_t
         plot_result_service_logger.error("绘图失败，错误原因: {0}".format(err))
         plot_result.plot_result_state = 2
 
-        # 第二步失败，落库，返回plot_result_id
+        # 第二步执行失败，更新记录，返回plot_result_id
         with PlotResultDao() as prd:
-            prd.insert_one_exc(plot_result)
+            prd.update_one_exc(plot_result)
 
         return plot_result.plot_result_id
     else:
@@ -102,9 +117,9 @@ def plot_time_num(plot_result: PlotResult, time_data_list, num_data_list, plot_t
         plot_result_service_logger.error("图片保存失败，错误原因: {0}".format(err))
         plot_result.plot_result_state = 3
 
-        # 第三步失败，落库，返回plot_result_id
+        # 第三步执行失败，更新记录，返回plot_result_id
         with PlotResultDao() as prd:
-            prd.insert_one_exc(plot_result)
+            prd.update_one_exc(plot_result)
 
         return plot_result.plot_result_id
     else:
@@ -116,19 +131,21 @@ def plot_time_num(plot_result: PlotResult, time_data_list, num_data_list, plot_t
     plot_remote_id = fdfs_util.upload_file(plot_picture_path)
     if plot_remote_id:
         plot_result_service_logger.info("图片上传成功，remote id: {0}".format(plot_remote_id))
+        plot_result.plot_result_upload_date_time = DATE_TIME_NOW
         plot_result.plot_result_url = FDFS_SERVER_ADDRESS + plot_remote_id
     else:
         plot_result_service_logger.error("图片上传失败")
         plot_result.plot_result_state = 4
 
-        # 第四步失败，落库，返回plot_result_id
+        # 第四步失败，更新记录，返回plot_result_id
         with PlotResultDao() as prd:
-            prd.insert_one_exc(plot_result)
+            prd.update_one_exc(plot_result)
 
         return plot_result.plot_result_id
 
-    # 全部成功，落库，返回plot_result_id
+    # 最后，全部步骤执行通过，更新记录，返回plot_result_id
+    plot_result.plot_result_state = 0
     with PlotResultDao() as prd:
-        prd.insert_one_exc(plot_result)
+        prd.update_one_exc(plot_result)
 
     return plot_result.plot_result_id

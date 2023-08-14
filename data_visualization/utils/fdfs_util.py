@@ -27,6 +27,10 @@ else:
     fdfs_util_logger.info("初始化fdfs_client成功，配置内容: {0}".format(tracker_conf))
 
 
+# -----------------------------------------------------
+# 工具函数
+# -----------------------------------------------------
+
 def upload_file(file_path):
     """
     上传文件到FastDFS，返回文件ID

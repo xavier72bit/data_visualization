@@ -2,6 +2,7 @@ from flask import Flask
 from flask.json.provider import DefaultJSONProvider
 
 from data_visualization.api import sysinfo
+from data_visualization.api import plot
 from data_visualization.utils import config_util, logging_util
 
 # -----------------------------------------------------
@@ -36,12 +37,10 @@ app = CurrentFlask(__name__)
 
 # app的日志初始化
 # 这一步只是给 Flask app 的 logger 添加一个 FileHandler
-# TODO: 可以考虑使用MemoryHandler日志缓存
 web_app_file_handler = logging_util.create_file_handler('flask_web_api.log', 'DEBUG')
 app.logger.addHandler(web_app_file_handler)
 
 # 重新配置werkzeug的日志，覆盖默认配置
-# TODO: 可以考虑使用MemoryHandler日志缓存
 werkzeug_logger = logging_util.std_init_module_logging('werkzeug', 'DEBUG', 'wsgi_request.log')
 
 app.config.from_mapping(app_config_dict)
@@ -52,6 +51,7 @@ main_logger.info("app配置：{0}".format(app.config))
 # -----------------------------------------------------
 
 app.register_blueprint(sysinfo.sysinfo_api, url_prefix='/sysinfo')
+app.register_blueprint(plot.plot_api, url_prefix='/plot')
 
 # -----------------------------------------------------
 # 程序入口

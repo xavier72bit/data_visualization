@@ -1,10 +1,18 @@
 import matplotlib.pyplot as plt
 
+# -----------------------------------------------------
+# 定义字体
+# -----------------------------------------------------
+
 font_rc = {'family': 'SimSun',
            'size': '12'}
 
 plt.rc('font', **font_rc)
 
+
+# -----------------------------------------------------
+# 绘图功能函数
+# -----------------------------------------------------
 
 def draw_catalog_num_bar(catalog_data_list, num_data_list, plot_title) -> plt.Figure:
     """

@@ -39,6 +39,10 @@ create table access_log
 pip install -r requirements.txt
 ```
 
+# 项目启动
+
+运行 main.py
+
 # 示例接口
 
 ### 1. 根据ip地址统计访问次数

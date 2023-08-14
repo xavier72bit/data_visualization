@@ -28,7 +28,7 @@ plot_state_dict = {
 # API
 # -----------------------------------------------------
 
-@plot_api.route('/source', methods=['POST'])
+@plot_api.route('/source/two', methods=['POST'])
 def plot_time_num_with_source():
     # 记录请求
     access_log_id = access_log_service.creat_a_new_access_log(access_ip=request.remote_addr,
@@ -40,18 +40,67 @@ def plot_time_num_with_source():
 
     # 接收json数据
     json_data = request.get_json()
+
     time_data_list = json_data['time_data_list']
-    print(time_data_list)
     num_data_list = json_data['num_data_list']
-    print(num_data_list)
     plot_title = json_data['plot_title']
-    print(plot_title)
 
     # 绘图
     plot_result_id = plot_result_service.plot_time_num(plot_result_id=new_plot_result_id,
                                                        time_data_list=time_data_list,
                                                        num_data_list=num_data_list,
                                                        plot_title=plot_title)
+
+    # 获取绘图状态
+    state_code = plot_result_service.read_state_by_id(plot_result_id)
+
+    # 获取状态描述
+    state_message = plot_state_dict[state_code]
+
+    if state_code:
+        # 绘图状态不正常
+        res_data = {
+            'code': state_code,
+            'msg': state_message,
+            'data': None
+        }
+    else:
+        # 绘图状态正常
+
+        # 获取url
+        plot_picture_url = plot_result_service.read_url_by_id(plot_result_id)
+
+        res_data = {
+            'code': state_code,
+            'msg': state_message,
+            'data': plot_picture_url
+        }
+
+    return jsonify(res_data)
+
+
+@plot_api.route('/source/three', methods=['POST'])
+def plot_catalog_time_num_with_source():
+    # 记录请求
+    access_log_id = access_log_service.creat_a_new_access_log(access_ip=request.remote_addr,
+                                                              access_token='zanshimeiyoutoken',
+                                                              access_log_message='zanshibuzhidaotiansha')
+
+    # 新建plot_result
+    new_plot_result_id = plot_result_service.create_a_new_plot_result(access_log_id)
+
+    # 接收json数据
+    json_data = request.get_json()
+
+    time_data_list = json_data['time_data_list']
+    catalog_num_data_dict = json_data['catalog_num_data_dict']
+    plot_title = json_data['plot_title']
+
+    # 绘图
+    plot_result_id = plot_result_service.plot_catalog_time_num(plot_result_id=new_plot_result_id,
+                                                               time_data_list=time_data_list,
+                                                               catalog_num_data_dict=catalog_num_data_dict,
+                                                               plot_title=plot_title)
 
     # 获取绘图状态
     state_code = plot_result_service.read_state_by_id(plot_result_id)

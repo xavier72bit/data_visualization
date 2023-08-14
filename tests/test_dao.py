@@ -137,11 +137,11 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         plot_result = PlotResult(plot_result_id=str(uuid.uuid4()),
                                  access_log_id=str(uuid.uuid4()),
                                  plot_result_finish_date_time=DATE_TIME_NOW,
-                                 plot_result_finish_state=1,
                                  plot_result_local_path="/tmp/test/temp_plot/test_result",
                                  plot_result_upload_date_time=DATE_TIME_NOW,
-                                 plot_result_upload_state=1,
-                                 plot_result_url="test_example_url")
+                                 plot_result_url="test_example_url",
+                                 plot_result_state=0,
+                                 plot_result_type='test')
 
         # 插入这条plot_result
         with PlotResultDao() as prd:
@@ -158,16 +158,16 @@ class PlotResultDaoBaseTest(unittest.TestCase):
                          str(new_plot_result.access_log_id))
         self.assertEqual(plot_result.plot_result_finish_date_time,
                          new_plot_result.plot_result_finish_date_time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.assertEqual(plot_result.plot_result_finish_state,
-                         new_plot_result.plot_result_finish_state)
         self.assertEqual(plot_result.plot_result_local_path,
                          new_plot_result.plot_result_local_path)
         self.assertEqual(plot_result.plot_result_upload_date_time,
                          new_plot_result.plot_result_upload_date_time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.assertEqual(plot_result.plot_result_upload_state,
-                         new_plot_result.plot_result_upload_state)
         self.assertEqual(plot_result.plot_result_url,
                          new_plot_result.plot_result_url)
+        self.assertEqual(plot_result.plot_result_state,
+                         new_plot_result.plot_result_state)
+        self.assertEqual(plot_result.plot_result_type,
+                         new_plot_result.plot_result_type)
 
     def test_b_multi_insert_one_exc(self):
         """
@@ -182,11 +182,11 @@ class PlotResultDaoBaseTest(unittest.TestCase):
                 plot_result = PlotResult(plot_result_id=str(uuid.uuid4()),
                                          access_log_id=access_log_id,
                                          plot_result_finish_date_time=DATE_TIME_NOW,
-                                         plot_result_finish_state=1,
                                          plot_result_local_path="/tmp/test/temp_plot/test_result",
                                          plot_result_upload_date_time=DATE_TIME_NOW,
-                                         plot_result_upload_state=1,
-                                         plot_result_url="test_example_url")
+                                         plot_result_url="test_example_url",
+                                         plot_result_state=0,
+                                         plot_result_type='test')
 
                 # 将这条plot_result信息插入数据库
                 exec_affect_row = prd.insert_one_exc(plot_result)
@@ -220,11 +220,11 @@ class PlotResultDaoBaseTest(unittest.TestCase):
         plot_result = PlotResult(plot_result_id=str(uuid.uuid4()),
                                  access_log_id=str(uuid.uuid4()),
                                  plot_result_finish_date_time=DATE_TIME_NOW,
-                                 plot_result_finish_state=1,
                                  plot_result_local_path="/tmp/test/temp_plot/test_result",
                                  plot_result_upload_date_time=DATE_TIME_NOW,
-                                 plot_result_upload_state=1,
-                                 plot_result_url="test_example_url")
+                                 plot_result_url="test_example_url",
+                                 plot_result_state=0,
+                                 plot_result_type='test')
 
         with PlotResultDao() as prd:
             prd.insert_one_exc(plot_result)

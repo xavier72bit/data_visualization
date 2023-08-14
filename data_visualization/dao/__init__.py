@@ -124,13 +124,13 @@ class BasicSqlGenerator:
 
             return sql_str
         else:
-            self._logger.error("指定字段不在表定义内！SQL执行失败！")
+            self._logger.error("指定字段不在表定义内！SQL生成失败！")
             return None
 
 
 class SqlParamGenerator:
     """
-    将domain数据对象转化为元组
+    将domain数据对象转化为列表
     """
     _logger: Logger = None
 
@@ -187,10 +187,9 @@ class SqlParamGenerator:
 
 class DaoInterface:
     """
-    dao层 所有Dao类的统一规范接口，此类禁止实例化。
-    此类定义了：
-    1. 所有Dao通用的`__init__`、`__enter__`、`__exit__`方法
-    2. Dao常用的5种CRUD操作：单条插入、单条更新、单条删除、单条查询、多条查询
+    dao层 所有Dao类的统一规范接口
+
+    此类定义了所有Dao对象通用的`__init__`、`__enter__`、`__exit__`方法
 
     为了正常记录日志，**请在定义完子类后，调用init_logger类方法绑定Logger**
     """

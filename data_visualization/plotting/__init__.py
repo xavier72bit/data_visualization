@@ -2,23 +2,16 @@ import os
 import os.path
 from project_common import CURRENT_PLOT_PATH
 
+from data_visualization.utils import logging_util
 
-def choose_plot_data_source():
-    """
-    数据源模式下，选择绘图类型
-    """
-    pass
+# -----------------------------------------------------
+# 初始化模块日志
+# -----------------------------------------------------
 
-
-def choose_plot_data_object():
-    """
-    数据对象模式下，选择绘图类型
-    """
-    pass
+plotting_logger = logging_util.std_init_module_logging(__name__, 'DEBUG', '{0}.log'.format(__name__))
 
 
-# TODO: 注解类型表达式
-def plot_storage(figure, file_name: str):
+def plot_storage(figure, file_name: str) -> str | int:
     """
     绘图结果存储
     """
@@ -27,6 +20,10 @@ def plot_storage(figure, file_name: str):
 
     file_path = os.path.join(CURRENT_PLOT_PATH, file_name)
 
-    figure.savefig(file_path)
-
-
+    try:
+        figure.savefig(file_path)
+    except Exception as err:
+        plotting_logger.error('图片存储出错，错误原因: {0}'.format(err))
+        return 2
+    else:
+        return file_path + '.png'

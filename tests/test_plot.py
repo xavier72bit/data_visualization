@@ -20,13 +20,13 @@ class PlottingTimeNumTest(unittest.TestCase):
         fig = draw_plot_line.draw_time_num_line(self.one_week_sep_one_day,
                                                 generate_nums(self.one_week_sep_one_day),
                                                 'test_time_num_line')
-        plotting.plot_storage(fig, file_name='test_time_num_line')
+        print(plotting.plot_storage(fig, file_name='test_time_num_line'))
 
     def test_B_draw_plot_time_num_column(self):
         fig = draw_plot_column.draw_time_num_column(self.one_week_sep_one_day,
                                                     generate_nums(self.one_week_sep_one_day),
                                                     'test_time_num_column')
-        plotting.plot_storage(fig, file_name='test_time_num_column')
+        print(plotting.plot_storage(fig, file_name='test_time_num_column'))
 
 
 class PlottingCatalogNumTest(unittest.TestCase):
@@ -36,25 +36,25 @@ class PlottingCatalogNumTest(unittest.TestCase):
         fig = draw_plot_pie.draw_catalog_num_pie(self.catalog_list,
                                                  generate_nums(self.catalog_list),
                                                  'test_catalog_num_pie')
-        plotting.plot_storage(fig, 'test_catalog_num_pie')
+        print(plotting.plot_storage(fig, 'test_catalog_num_pie'))
 
     def test_B_draw_plot_catalog_num_bar(self):
         fig = draw_plot_bar.draw_catalog_num_bar(self.catalog_list,
                                                  generate_nums(self.catalog_list),
                                                  'test_catalog_num_bar')
-        plotting.plot_storage(fig, 'test_catalog_num_bar')
+        print(plotting.plot_storage(fig, 'test_catalog_num_bar'))
 
     def test_C_draw_plot_catalog_num_column(self):
         fig = draw_plot_column.draw_catalog_num_column(self.catalog_list,
                                                        generate_nums(self.catalog_list),
                                                        'test_catalog_num_column')
-        plotting.plot_storage(fig, 'test_catalog_num_column')
+        print(plotting.plot_storage(fig, 'test_catalog_num_column'))
 
     def test_D_draw_plot_catalog_num_radar(self):
         fig = draw_plot_radar.draw_catalog_num_radar(self.catalog_list,
                                                      generate_nums(self.catalog_list),
                                                      'test_catalog_num_radar')
-        plotting.plot_storage(fig, 'test_catalog_num_radar')
+        print(plotting.plot_storage(fig, 'test_catalog_num_radar'))
 
 
 class PlottingCatalogTimeNumTest(unittest.TestCase):
@@ -72,13 +72,13 @@ class PlottingCatalogTimeNumTest(unittest.TestCase):
         fig = draw_plot_column.draw_time_catalog_num_column(self.one_week_sep_one_day,
                                                             self.catalog_num_dict,
                                                             'test_time_catalog_num_column')
-        plotting.plot_storage(fig, 'test_time_catalog_num_column')
+        print(plotting.plot_storage(fig, 'test_time_catalog_num_column'))
 
     def test_B_draw_plot_catalog_time_num_line(self):
         fig = draw_plot_line.draw_time_catalog_num_line(self.one_week_sep_one_day,
                                                         self.catalog_num_dict,
                                                         'test_time_catalog_num_line')
-        plotting.plot_storage(fig, 'test_time_catalog_num_line')
+        print(plotting.plot_storage(fig, 'test_time_catalog_num_line'))
 
 
 if __name__ == '__main__':

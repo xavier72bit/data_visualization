@@ -1,7 +1,6 @@
 import uuid
-from data_visualization.utils import fdfs_util
-from data_visualization.utils import logging_util
 from project_common import DATE_TIME_NOW, FDFS_SERVER_ADDRESS
+from data_visualization.utils import fdfs_util, minio_util, logging_util
 
 from data_visualization.domain.plot_result import PlotResult
 from data_visualization.dao.plot_result_dao import PlotResultDao

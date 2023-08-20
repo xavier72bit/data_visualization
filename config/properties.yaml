@@ -37,3 +37,10 @@ database_connection_pool:
   set_session: ["SET AUTOCOMMIT = 1"]
   # 设定当连接用完返回到连接池时，该如何重置连接（为 False 或 None 时，回滚以 `connection.begin()` 开始的事务；为 True 时，始终为了安全起见发起回滚）
   reset: TRUE
+
+## minio配置
+minio:
+  endpoint: "192.168.64.17:9001"
+  user: admin
+  password: you_password
+  enable_https: False

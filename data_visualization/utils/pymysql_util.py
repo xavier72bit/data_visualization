@@ -39,7 +39,7 @@ try:
                                setsession=database_connection_pool_config['set_session'],
                                reset=database_connection_pool_config['reset']
                                )
-except Exception as e:
-    pymysql_util_logger.critical('初始化数据库连接池失败，错误: {0}'.format(e))
+except Exception as err:
+    pymysql_util_logger.critical('初始化数据库连接池失败，错误: {0}'.format(err))
 else:
     pymysql_util_logger.info('数据库连接池初始化成功')

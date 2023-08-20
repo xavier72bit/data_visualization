@@ -1,6 +1,6 @@
 import uuid
-from project_common import DATE_TIME_NOW, FDFS_SERVER_ADDRESS
-from data_visualization.utils import fdfs_util, minio_util, logging_util
+from project_common import DATE_TIME_NOW, MINIO_SERVER_ADDRESS
+from data_visualization.utils import minio_util, logging_util
 
 from data_visualization.domain.plot_result import PlotResult
 from data_visualization.dao.plot_result_dao import PlotResultDao
@@ -127,11 +127,11 @@ def plot_time_num(plot_result_id, time_data_list, num_data_list, plot_title):
         plot_result.plot_result_local_path = plot_picture_path
 
     # 第四步，上传图表
-    plot_remote_id = fdfs_util.upload_file(plot_picture_path)
-    if plot_remote_id:
-        plot_result_service_logger.info("图片上传成功，remote id: {0}".format(plot_remote_id))
+    plot_remote_url = minio_util.upload_file(plot_picture_path)
+    if plot_remote_url:
+        plot_result_service_logger.info("图片上传成功，remote url: {0}".format(plot_remote_url))
         plot_result.plot_result_upload_date_time = DATE_TIME_NOW
-        plot_result.plot_result_url = FDFS_SERVER_ADDRESS + plot_remote_id
+        plot_result.plot_result_url = MINIO_SERVER_ADDRESS + plot_remote_url
     else:
         plot_result_service_logger.error("图片上传失败")
         plot_result.plot_result_state = 4
@@ -216,11 +216,11 @@ def plot_catalog_time_num(plot_result_id, time_data_list, catalog_num_data_dict,
         plot_result.plot_result_local_path = plot_picture_path
 
     # 第四步，上传图表
-    plot_remote_id = fdfs_util.upload_file(plot_picture_path)
-    if plot_remote_id:
-        plot_result_service_logger.info("图片上传成功，remote id: {0}".format(plot_remote_id))
+    plot_remote_url = minio_util.upload_file(plot_picture_path)
+    if plot_remote_url:
+        plot_result_service_logger.info("图片上传成功，remote url: {0}".format(plot_remote_url))
         plot_result.plot_result_upload_date_time = DATE_TIME_NOW
-        plot_result.plot_result_url = FDFS_SERVER_ADDRESS + plot_remote_id
+        plot_result.plot_result_url = MINIO_SERVER_ADDRESS + plot_remote_url
     else:
         plot_result_service_logger.error("图片上传失败")
         plot_result.plot_result_state = 4

@@ -70,9 +70,9 @@ else:
 # -----------------------------------------------------
 
 
-def upload_file(file_path) -> None | str:
+def upload_file(file_path: str) -> None | str:
     """
-    上传png图片到minio，返回预览地址
+    上传png图片到minio，返回文件URL后缀
     """
 
     object_name = os.path.split(file_path)[-1]

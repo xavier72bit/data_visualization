@@ -39,8 +39,14 @@ else:
 minio_bucket_name = "py-data-visualization"
 minio_bucket_policy_dict = config_util.read_json('minio_bucket_policy_anyone_readonly.json')
 
+try:
+    is_bucket_exist = minio_client.bucket_exists(minio_bucket_name)
+except Exception as err:
+    minio_util_logger.error("访问minio_client API失败，错误原因：{0}".format(err))
+    is_bucket_exist = None
+
 if minio_client:
-    if minio_client.bucket_exists(minio_bucket_name):
+    if is_bucket_exist:
         minio_util_logger.info("{0}存储桶已存在".format(minio_bucket_name))
     else:
         minio_util_logger.info("{0}存储桶不存在，创建存储桶".format(minio_bucket_name))

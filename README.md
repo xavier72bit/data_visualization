@@ -72,7 +72,7 @@ POST http://127.0.0.1:5001/plot/source/two
 ```json
 {
   "code": 0,
-  "data": "https://fs.zhulin.xin/group1/M00/00/07/dT7MrWTaHEOARmpRAAAknNr7VZM568.png",
+  "data": "http://192.168.64.17:9001/py-data-visualization/f803e961-0bf0-410e-b387-25592b935b23.png",
   "msg": "绘图成功"
 }
 ```
@@ -94,7 +94,7 @@ POST http://127.0.0.1:5001/plot/source/two
 ```json
 {
   "code": 0,
-  "data": "https://fs.zhulin.xin/group1/M00/00/07/dT7MrWTaUgCASvLwAABaKfK-3CQ246.png",
+  "data": "http://192.168.64.17:9001/py-data-visualization/b6762940-b61f-40d6-a8fb-eacb12e5067a.png",
   "msg": "绘图成功"
 }
 ```
@@ -125,6 +125,8 @@ POST http://127.0.0.1:5001/plot/source/two
 
 数据字典项少于3，是并列柱状图，大于3，是多条折线图
 
+POST http://127.0.0.1:5001/plot/source/three
+
 ##### 示例1
 
 请求体：
@@ -146,7 +148,7 @@ POST http://127.0.0.1:5001/plot/source/two
 ```json
 {
   "code": 0,
-  "data": "https://fs.zhulin.xin/group1/M00/00/07/dT7MrWTaVPWADnjrAABR3qtARNY134.png",
+  "data": "http://192.168.64.17:9001/py-data-visualization/ac3707fb-0d60-4946-b801-b7a674d1e8bf.png",
   "msg": "绘图成功"
 }
 ```
@@ -175,7 +177,7 @@ POST http://127.0.0.1:5001/plot/source/two
 ```json
 {
   "code": 0,
-  "data": "https://fs.zhulin.xin/group1/M00/00/07/dT7MrWTaVWOAQoVyAAEQbIwwUbQ526.png",
+  "data": "http://192.168.64.17:9001/py-data-visualization/9676610f-989e-40f7-af47-336eae0c0fd8.png",
   "msg": "绘图成功"
 }
 ```

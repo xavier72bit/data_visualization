@@ -1,7 +1,7 @@
 # 数据库准备
 
 ```sql
-create database data_visualization;
+CREATE SCHEMA `data_visualization` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'data_visualization'@'%' IDENTIFIED BY 'data_visualization';
 GRANT ALL PRIVILEGES ON `data_visualization`.* TO 'data_visualization'@'%' WITH GRANT OPTION;
 ```

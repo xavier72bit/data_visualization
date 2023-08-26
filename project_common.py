@@ -1,8 +1,6 @@
 import os.path
 import datetime
 
-__all__ = ["CURRENT_WORKSPACE", "CURRENT_CONFIG_PATH", "CURRENT_LOG_PATH", "CURRENT_PLOT_PATH",
-           "DATE_TIME_NOW", "FDFS_SERVER_ADDRESS", "MINIO_SERVER_ADDRESS", "FILE_CONTENT_TYPE_DICT"]
 
 # 工作目录
 CURRENT_WORKSPACE = os.path.split(os.path.abspath(__file__))[0]

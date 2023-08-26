@@ -91,3 +91,16 @@ POST http://127.0.0.1:5001/plot/source
 }
 ```
 
+## 2023.08.24
+
+接下来的项目开发修改计划
+
+1. 将数据库连接控制定义到MysqlUtil中，自己封装MysqlConnection类，用dao层调用MysqlConnection类
+2. 不能将日志分散在多个不同的文件中，将所有日志统一输出到同一个文件，logging模块现在只对外提供logger
+3. plotting模块移入utils中
+
+## 2023.08.24
+
+第二次重构项目结构完成。
+
+api -> service/stream -> dao -> utils.db.MysqlUtil

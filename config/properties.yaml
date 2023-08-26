@@ -1,6 +1,6 @@
 ## Flask app 配置
 app:
-  DEBUG: true
+  DEBUG: false
 
 ## Flask app server 配置
 app_server:

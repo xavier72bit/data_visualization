@@ -45,9 +45,9 @@ pip install -r requirements.txt
 
 # 示例接口
 
-### 1. 根据ip地址统计访问次数
+### 1. 测试服务可用
 
-GET http://127.0.0.1:5001/sysinfo/ip_access_count?ip_address=127.0.0.1
+GET http://127.0.0.1:5001/sysinfo/test
 
 ### 2. 提供两个数据序列绘图
 

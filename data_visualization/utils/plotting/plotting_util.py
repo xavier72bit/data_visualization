@@ -1,14 +1,7 @@
 import os
 import os.path
+from loguru import logger
 from project_common import CURRENT_PLOT_PATH
-
-from data_visualization.utils import logging_util
-
-# -----------------------------------------------------
-# 初始化模块日志
-# -----------------------------------------------------
-
-plotting_logger = logging_util.std_init_module_logging(__name__, 'DEBUG', '{0}.log'.format(__name__))
 
 
 # -----------------------------------------------------
@@ -27,7 +20,7 @@ def plot_storage(figure, file_name: str) -> str | int:
     try:
         figure.savefig(file_path)
     except Exception as err:
-        plotting_logger.error('图片存储出错，错误原因: {0}'.format(err))
+        logger.error('图片存储出错，错误原因: {0}'.format(err))
         return 2
     else:
         return file_path + '.png'

@@ -1,239 +1,84 @@
-import uuid
-from project_common import DATE_TIME_NOW, MINIO_SERVER_ADDRESS
-from data_visualization.utils import minio_util, logging_util
+import typing
+from data_visualization.dao import plot_result_dao
 
-from data_visualization.domain.plot_result import PlotResult
-from data_visualization.dao.plot_result_dao import PlotResultDao
-
-from data_visualization.plotting import plot_storage
-from data_visualization.plotting import draw_plot_line, draw_plot_radar, draw_plot_column, draw_plot_bar, draw_plot_pie
-
-"""
-plot_result_finish_state 绘图结果状态：
-
-=========== =============================
- 状态码        意义
------------ -----------------------------
-    '0'       '绘图成功'
-    '1'       '数据序列长度不一致'
-    '2'       '绘图失败'
-    '3'       '图片保存失败'
-    '4'       '图片上传失败'
-=========== =============================
-"""
-
-# -----------------------------------------------------
-# 初始化模块日志
-# -----------------------------------------------------
-
-plot_result_service_logger = logging_util.std_init_module_logging(__name__, 'DEBUG', '{0}.log'.format(__name__))
+from data_visualization.utils.do.data_object import PlotResult
+from data_visualization.utils.do.data_object_util import general_primary_key
 
 
-# -----------------------------------------------------
-# 功能函数
-# -----------------------------------------------------
-
-
-def create_a_new_plot_result(access_log_id):
+def create(plot_result: PlotResult) -> PlotResult | bool:
     """
-    创建一个新的plot_result，返回plot_result_id
+    创建一个新的plot_result并插入数据库。
+
+    :return: 成功plot_result，失败False。
     """
-    plot_result = PlotResult(plot_result_id=str(uuid.uuid4()),
-                             access_log_id=access_log_id)
+    # 验证access_log_id非空
+    if plot_result.access_log_id is None:
+        return False
 
-    with PlotResultDao() as prd:
-        prd.insert_one_exc(plot_result)
+    # 设置主键ID
+    plot_result.plot_result_id = general_primary_key()
 
-    return plot_result.plot_result_id
+    # 插入操作
+    insert_result = plot_result_dao.insert(plot_result)
 
-
-def read_url_by_id(plot_result_id):
-    """
-    根据plot_result_id读取plot_result_url
-    """
-    plot_result = PlotResult(plot_result_id=plot_result_id)
-
-    with PlotResultDao() as prd:
-        plot_result = prd.select_one_exc_by_pk(plot_result)
-
-    return plot_result.plot_result_url
-
-
-def read_state_by_id(plot_result_id):
-    """
-    根据plot_result_id读取plot_result_state
-    """
-    plot_result = PlotResult(plot_result_id=plot_result_id)
-
-    with PlotResultDao() as prd:
-        plot_result = prd.select_one_exc_by_pk(plot_result)
-
-    return plot_result.plot_result_state
-
-
-def plot_time_num(plot_result_id, time_data_list, num_data_list, plot_title):
-    """
-    绘制 时间-数字 类型的图表
-    """
-    # 根据传入的plot_result_id，从数据库中查询这条plot_result记录
-    with PlotResultDao() as prd:
-        plot_result = prd.select_one_exc_by_pk(PlotResult(plot_result_id=plot_result_id))
-
-    # 第一步，判断传入的两个列表长度是否一致
-    if len(time_data_list) != len(num_data_list):
-        plot_result.plot_result_state = 1
-
-        # 第一步判断失败，更新记录，返回plot_result_id
-        with PlotResultDao() as prd:
-            prd.update_one_exc(plot_result)
-
-        return plot_result.plot_result_id
-
-    # 第二步，根据time_data_list长度，选择图表，调用相应函数绘图
-    try:
-        if len(time_data_list) <= 7:
-            fig = draw_plot_column.draw_time_num_column(time_data_list, num_data_list, plot_title)
-            plot_result.plot_result_type = 'column'
-        else:
-            fig = draw_plot_line.draw_time_num_line(time_data_list, num_data_list, plot_title)
-            plot_result.plot_result_type = 'line'
-    except Exception as err:
-        plot_result_service_logger.error("绘图失败，错误原因: {0}".format(err))
-        plot_result.plot_result_state = 2
-
-        # 第二步执行失败，更新记录，返回plot_result_id
-        with PlotResultDao() as prd:
-            prd.update_one_exc(plot_result)
-
-        return plot_result.plot_result_id
+    # 根据影响行数判断是否插入成功
+    if insert_result:
+        return plot_result
     else:
-        plot_result_service_logger.info("绘图成功，fig对象: {0}".format(fig))
-
-    # 第三步，存储图表
-    try:
-        plot_picture_path = plot_storage(fig, plot_result_id)
-    except Exception as err:
-        plot_result_service_logger.error("图片保存失败，错误原因: {0}".format(err))
-        plot_result.plot_result_state = 3
-
-        # 第三步执行失败，更新记录，返回plot_result_id
-        with PlotResultDao() as prd:
-            prd.update_one_exc(plot_result)
-
-        return plot_result.plot_result_id
-    else:
-        plot_result_service_logger.info("图片保存成功")
-        plot_result.plot_result_finish_date_time = DATE_TIME_NOW
-        plot_result.plot_result_local_path = plot_picture_path
-
-    # 第四步，上传图表
-    plot_remote_url = minio_util.upload_file(plot_picture_path)
-    if plot_remote_url:
-        plot_result_service_logger.info("图片上传成功，remote url: {0}".format(plot_remote_url))
-        plot_result.plot_result_upload_date_time = DATE_TIME_NOW
-        plot_result.plot_result_url = MINIO_SERVER_ADDRESS + plot_remote_url
-    else:
-        plot_result_service_logger.error("图片上传失败")
-        plot_result.plot_result_state = 4
-
-        # 第四步失败，更新记录，返回plot_result_id
-        with PlotResultDao() as prd:
-            prd.update_one_exc(plot_result)
-
-        return plot_result.plot_result_id
-
-    # 最后，全部步骤执行通过，更新记录，返回plot_result_id
-    plot_result.plot_result_state = 0
-    with PlotResultDao() as prd:
-        prd.update_one_exc(plot_result)
-
-    return plot_result.plot_result_id
+        return False
 
 
-def plot_catalog_time_num(plot_result_id, time_data_list, catalog_num_data_dict, plot_title):
+def delete(plot_result: PlotResult) -> bool:
     """
-    绘制 类别-时间-数字 类型的图表
+    从数据库中删除
 
-    `time_data_list`:
-    [time1, time2, time3, time4]
-    `catalog_num_data_dict`:
-    {
-        catalog1: [num1, num2, num3, num4],
-        catalog2: [num1, num2, num3, num4],
-        catalog3: [num1, num2, num3, num4]
-    }
+    :return:
     """
-    # 根据传入的plot_result_id，从数据库中查询这条plot_result记录
-    with PlotResultDao() as prd:
-        plot_result = prd.select_one_exc_by_pk(PlotResult(plot_result_id=plot_result_id))
+    delete_result = plot_result_dao.delete(plot_result)
 
-    # 第一步，循环判断每个catalog对应的num_data_list
-    for catalog in catalog_num_data_dict.keys():
-        if len(time_data_list) != len(catalog_num_data_dict[catalog]):
-            plot_result.plot_result_state = 1
-
-            # 第一步判断失败，更新记录，返回plot_result_id
-            with PlotResultDao() as prd:
-                prd.update_one_exc(plot_result)
-
-            return plot_result.plot_result_id
-
-    # 第二步，根据catalog_num的数量，选择图表，调用相应函数绘图
-    try:
-        if len(catalog_num_data_dict) <= 3:
-            fig = draw_plot_column.draw_time_catalog_num_column(time_data_list, catalog_num_data_dict, plot_title)
-            plot_result.plot_result_type = 'column'
-        else:
-            fig = draw_plot_line.draw_time_catalog_num_line(time_data_list, catalog_num_data_dict, plot_title)
-            plot_result.plot_result_type = 'line'
-    except Exception as err:
-        plot_result_service_logger.error("绘图失败，错误原因: {0}".format(err))
-        plot_result.plot_result_state = 2
-
-        # 第二步执行失败，更新记录，返回plot_result_id
-        with PlotResultDao() as prd:
-            prd.update_one_exc(plot_result)
-
-        return plot_result.plot_result_id
+    if delete_result:
+        return True
     else:
-        plot_result_service_logger.info("绘图成功，fig对象: {0}".format(fig))
+        return False
 
-    # 第三步，存储图表
-    try:
-        plot_picture_path = plot_storage(fig, plot_result_id)
-    except Exception as err:
-        plot_result_service_logger.error("图片保存失败，错误原因: {0}".format(err))
-        plot_result.plot_result_state = 3
 
-        # 第三步执行失败，更新记录，返回plot_result_id
-        with PlotResultDao() as prd:
-            prd.update_one_exc(plot_result)
+def update(plot_result: PlotResult) -> bool:
+    """
+    更新plot_result信息。
 
-        return plot_result.plot_result_id
+    :return: 成功True，失败False。
+    """
+    # 验证传入的plot_result在数据库中是否有记录
+    old_plot_result = plot_result_dao.select_one(plot_result)
+
+    if old_plot_result is None:
+        return False
+
+    # 更新操作
+    update_result = plot_result_dao.update(plot_result)
+
+    # 根据影响行数判断是否更新成功
+    if update_result:
+        return True
     else:
-        plot_result_service_logger.info("图片保存成功")
-        plot_result.plot_result_finish_date_time = DATE_TIME_NOW
-        plot_result.plot_result_local_path = plot_picture_path
+        return False
 
-    # 第四步，上传图表
-    plot_remote_url = minio_util.upload_file(plot_picture_path)
-    if plot_remote_url:
-        plot_result_service_logger.info("图片上传成功，remote url: {0}".format(plot_remote_url))
-        plot_result.plot_result_upload_date_time = DATE_TIME_NOW
-        plot_result.plot_result_url = MINIO_SERVER_ADDRESS + plot_remote_url
-    else:
-        plot_result_service_logger.error("图片上传失败")
-        plot_result.plot_result_state = 4
 
-        # 第四步失败，更新记录，返回plot_result_id
-        with PlotResultDao() as prd:
-            prd.update_one_exc(plot_result)
+def read_one(plot_result: PlotResult) -> PlotResult | None:
+    """
+    从数据库读取plot_result
 
-        return plot_result.plot_result_id
+    :return: 成功PlotResult，失败None。
+    """
 
-    # 最后，全部步骤执行通过，更新记录，返回plot_result_id
-    plot_result.plot_result_state = 0
-    with PlotResultDao() as prd:
-        prd.update_one_exc(plot_result)
+    return plot_result_dao.select_one(plot_result)
 
-    return plot_result.plot_result_id
+
+def read_list_by_access_log_id(plot_result: PlotResult) -> typing.List[PlotResult] | None:
+    """
+    根据access_log_id，从数据库读取plot_result列表
+
+    :return: 成功List[PlotResult]，失败None
+    """
+
+    return plot_result_dao.select_list_by_access_log_id(plot_result)

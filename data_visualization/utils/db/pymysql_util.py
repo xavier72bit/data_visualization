@@ -54,10 +54,7 @@ class MysqlUtil:
     def __enter__(self):
         """
         进入环境管理器时，自动获取mysql连接与光标
-
-        :return: Dao
         """
-        logger.info("获取MySQL连接")
         try:
             self._mysql_connection = self._connection_pool.get_connection()
         except Exception as get_connection_err:

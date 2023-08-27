@@ -13,12 +13,7 @@ class MinioUtil:
     minio_client_config = config_util.read_yaml('properties.yaml')['minio']
 
     def __init__(self):
-        # -----------------------------------------------------
         # 1. 初始化Minio Client对象
-        # -----------------------------------------------------
-
-        logger.info('开始初始化Minio Client')
-
         self.minio_client = Minio(endpoint=self.minio_client_config["endpoint"],
                                   access_key=self.minio_client_config["user"],
                                   secret_key=self.minio_client_config["password"],
@@ -26,10 +21,7 @@ class MinioUtil:
 
         logger.info('Minio Client初始化成功，配置内容：{0}'.format(self.minio_client_config))
 
-        # -----------------------------------------------------
         # 2. 创建存储桶，配置匿名用户只能读取对象，禁止遍历桶内文件
-        # -----------------------------------------------------
-
         is_bucket_exist = self.minio_client.bucket_exists(self.minio_bucket_name)
 
         if is_bucket_exist:
@@ -55,7 +47,7 @@ class MinioUtil:
                 logger.info("修改存储桶权限成功，权限：{0}"
                             .format(self.minio_client.get_bucket_policy(self.minio_bucket_name)))
 
-    def upload_file(self, file_path: str) -> None | str:
+    def upload_file(self, file_path: str) -> str | None:
         """
         上传文件到minio，返回文件URL后缀
         """

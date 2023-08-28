@@ -5,9 +5,10 @@ from dataclasses import dataclass
 class AccessLog:
     access_log_id: str | None = None
     access_date_time: str | None = None
-    access_token: str | None = None
-    access_log_message: str | None = None
     access_ip: str | None = None
+    access_url: str | None = None
+    access_body: str | None = None
+    access_plot_type: str | None = None
 
 
 @dataclass

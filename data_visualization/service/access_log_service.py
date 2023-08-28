@@ -3,15 +3,15 @@ from data_visualization.utils.do.data_object import AccessLog
 from data_visualization.utils.do.data_object_util import general_primary_key
 
 
-def create(access_log: AccessLog) -> AccessLog | bool:
+def create(access_log: AccessLog) -> AccessLog | None:
     """
     创建一个新的access_log并插入数据库。
 
-    :return: 成功access_log_id，失败None
+    :return: 成功access_log，失败None
     """
     # 验证access_log_id为空
     if access_log.access_log_id is not None:
-        return False
+        return None
 
     # 设置主键ID
     access_log.access_log_id = general_primary_key()

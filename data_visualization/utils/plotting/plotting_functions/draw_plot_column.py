@@ -5,8 +5,10 @@ import numpy as np
 # 定义字体
 # -----------------------------------------------------
 
-font_rc = {'family': 'SimSun',
-           'size': '12'}
+font_rc = {
+    'family': 'SimSun',
+    'size': '12'
+}
 
 plt.rc('font', **font_rc)
 

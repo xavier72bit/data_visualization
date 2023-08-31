@@ -4,10 +4,6 @@ from loguru import logger
 from project_common import CURRENT_PLOT_PATH
 
 
-# -----------------------------------------------------
-# 工具函数
-# -----------------------------------------------------
-
 def plot_storage(figure, file_name: str) -> str | int:
     """
     绘图结果存储

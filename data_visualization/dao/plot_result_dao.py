@@ -1,4 +1,3 @@
-import typing
 from data_visualization.utils.do.data_object import PlotResult
 from data_visualization.utils.db.pymysql_util import MysqlUtil
 
@@ -95,12 +94,12 @@ def select_one(plot_result: PlotResult) -> PlotResult | None:
     return plot_result_result
 
 
-def select_list_by_access_log_id(plot_result: PlotResult) -> typing.List[PlotResult] | None:
+def select_list_by_access_log_id(plot_result: PlotResult) -> list[PlotResult] | None:
     """
     SELECT
 
     :return: 查询到：包含多个PlotResult数据对象的列表；未查询到：None。
-    :rtype: typing.List[PlotResult] | None
+    :rtype: list[PlotResult] | None
     """
     sql = 'SELECT plot_result_id, access_log_id, plot_result_finish_date_time, plot_result_local_path, plot_result_upload_date_time, plot_result_url, plot_result_state, plot_result_type FROM plot_result WHERE access_log_id LIKE %s;'
     args = (

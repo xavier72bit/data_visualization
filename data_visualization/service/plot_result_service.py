@@ -1,4 +1,3 @@
-import typing
 from data_visualization.dao import plot_result_dao
 
 from data_visualization.utils.do.data_object import PlotResult
@@ -74,7 +73,7 @@ def read_one(plot_result: PlotResult) -> PlotResult | None:
     return plot_result_dao.select_one(plot_result)
 
 
-def read_list_by_access_log_id(plot_result: PlotResult) -> typing.List[PlotResult] | None:
+def read_list_by_access_log_id(plot_result: PlotResult) -> list[PlotResult] | None:
     """
     根据access_log_id，从数据库读取plot_result列表
 

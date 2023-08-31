@@ -1,16 +1,22 @@
-import typing
 from loguru import logger
 
 from data_visualization.service import plot_result_service
 from data_visualization.utils.do.data_object import PlotResult
 from project_common import DATE_TIME_NOW, MINIO_SERVER_ADDRESS
 from data_visualization.utils.storage.minio_util import MinioUtil
-from data_visualization.utils.plotting import plotting_util, draw_plot_line, draw_plot_column
+from data_visualization.utils.plotting import plotting_util
+from utils.plotting.plotting_functions import draw_plot_column, draw_plot_line
+
+
+# -----------------------------------------------------
+# 示例绘图功能 （开始）
+# 等待业务绘图功能基本开发完毕后，删除以下这些
+# -----------------------------------------------------
 
 
 def plot_time_num(access_log_id: str,
-                  time_data_list: typing.List,
-                  num_data_list: typing.List,
+                  time_data_list: list,
+                  num_data_list: list,
                   plot_title: str) -> PlotResult | None:
     """
     绘制 时间-数字 类型的图表
@@ -92,7 +98,7 @@ def plot_time_num(access_log_id: str,
 
 
 def plot_catalog_time_num(access_log_id: str,
-                          time_data_list: typing.List,
+                          time_data_list: list,
                           catalog_num_data_dict: dict,
                           plot_title: str) -> PlotResult | None:
     """
@@ -182,3 +188,8 @@ def plot_catalog_time_num(access_log_id: str,
     plot_result_service.update(plot_result)
 
     return plot_result
+
+# -----------------------------------------------------
+# 示例绘图功能 （结束）
+# 等待业务绘图功能基本开发完毕后，删除以上这些
+# -----------------------------------------------------

@@ -1,4 +1,3 @@
-import typing
 from data_visualization.utils.do.data_object import AccessLog
 from data_visualization.utils.db.pymysql_util import MysqlUtil
 
@@ -91,12 +90,12 @@ def select_one(access_log: AccessLog) -> AccessLog | None:
     return access_log_result
 
 
-def select_list_by_access_ip(access_log: AccessLog) -> typing.List[AccessLog] | None:
+def select_list_by_access_ip(access_log: AccessLog) -> list[AccessLog] | None:
     """
     SELECT
 
     :return: 包含多个AccessLog数据对象的列表
-    :rtype: typing.List[AccessLog] | None
+    :rtype: list[AccessLog] | None
     """
     sql = 'SELECT access_log_id, access_date_time, access_ip, access_url, access_body, access_plot_type FROM access_log WHERE access_ip LIKE %s;'
     args = (

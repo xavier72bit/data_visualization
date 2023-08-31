@@ -1,4 +1,3 @@
-import typing
 import pymysql
 from loguru import logger
 from pymysql.cursors import DictCursor
@@ -138,7 +137,7 @@ class MysqlUtil:
         else:
             return None
 
-    def select_list(self, sql, args) -> typing.List[dict] | None:
+    def select_list(self, sql, args) -> list[dict] | None:
         try:
             result = self._cursor.execute(sql, args)
         except Exception as select_one_err:

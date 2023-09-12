@@ -36,12 +36,14 @@ def check_plot_type(access_log: AccessLog,
     if not plot_data_source_1_object.is_data_valid or not plot_data_source_2_object.is_data_valid:
         logger.error("数据源结构无效，无法绘图")
         access_log.access_plot_flag = 1
+        access_log_service.update(access_log)
         return access_log
 
     # 判断两个数据源的长度是否一致，不一致则无法绘图
     if plot_data_source_1_object.data_source_length != plot_data_source_2_object.data_source_length:
         logger.error("两个数据源长度不一致，无法绘图")
         access_log.access_plot_flag = 2
+        access_log_service.update(access_log)
         return access_log
 
     # 分析两个数据源的类型

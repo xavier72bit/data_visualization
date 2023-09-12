@@ -33,7 +33,7 @@ def create(access_log: AccessLog) -> AccessLog | None:
 
 def update(access_log: AccessLog) -> bool:
     """
-    更新access_log信息，在这里进行 AccessLog.access_plot_type 列表转字符串 操作
+    更新access_log信息
 
     :return: 成功True，失败False。
     """
@@ -57,7 +57,7 @@ def update(access_log: AccessLog) -> bool:
 
 def read_one(access_log: AccessLog) -> AccessLog | None:
     """
-    读取一条access_log信息，在这里进行 AccessLog.access_plot_type 字符串转列表 操作
+    读取一条access_log信息
 
     :return: 成功AccessLog，失败None
     """

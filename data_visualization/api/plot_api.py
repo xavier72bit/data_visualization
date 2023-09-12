@@ -43,6 +43,8 @@ def commit_data_source():
     # 接收json数据
     json_data = request.get_json()
 
+    # TODO: 校验一下json的key是否符合要求
+
     # 记录请求
     access_log = access_log_service.create(AccessLog(access_ip=request.remote_addr,
                                                      access_url=request.url,

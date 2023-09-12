@@ -1,195 +1,88 @@
 from loguru import logger
 
-from data_visualization.service import plot_result_service
-from data_visualization.utils.do.data_object import PlotResult
-from project_common import DATE_TIME_NOW, MINIO_SERVER_ADDRESS
-from data_visualization.utils.storage.minio_util import MinioUtil
-from data_visualization.utils.plotting import plotting_util
-from utils.plotting.plotting_functions import draw_plot_column, draw_plot_line
+from project_common import PLOT_INDEX_TYPE_DICT
+from data_visualization.utils.plotting import plotting_engine
+from data_visualization.utils.do.data_object import AccessLog, PlotResult
+from data_visualization.service import access_log_service, plot_result_service
 
 
-# -----------------------------------------------------
-# 示例绘图功能 （开始）
-# 等待业务绘图功能基本开发完毕后，删除以下这些
-# -----------------------------------------------------
-
-
-def plot_time_num(access_log_id: str,
-                  time_data_list: list,
-                  num_data_list: list,
-                  plot_title: str) -> PlotResult | None:
+def _convert_plotting_type_list_2_str(plotting_type_list: list) -> str:
     """
-    绘制 时间-数字 类型的图表
-
-    :return: PlotResult | None
+    ['1', '2', '3', '4', '5'] -> '1:折线图,2:柱状图,3:条形图,4:饼状图,5:雷达图'
     """
-    # 1. 创建plot_result
-    plot_result = plot_result_service.create(PlotResult(access_log_id=access_log_id))
-
-    if plot_result is None:
-        return None
-
-    # 2. 绘图步骤
-    # 第一步，判断传入的两个列表长度是否一致
-    if len(time_data_list) != len(num_data_list):
-        plot_result.plot_result_state = 1
-
-        # 第一步判断失败，更新记录，返回plot_result
-        plot_result_service.update(plot_result)
-
-        return plot_result.plot_result_id
-
-    # 第二步，根据time_data_list长度，选择图表，调用相应函数绘图
-    try:
-        if len(time_data_list) <= 7:
-            fig = draw_plot_column.draw_time_num_column(time_data_list, num_data_list, plot_title)
-            plot_result.plot_result_type = 'column'
-        else:
-            fig = draw_plot_line.draw_time_num_line(time_data_list, num_data_list, plot_title)
-            plot_result.plot_result_type = 'line'
-    except Exception as err:
-        logger.error("绘图失败，错误原因: {0}".format(err))
-        plot_result.plot_result_state = 2
-
-        # 第二步执行失败，更新记录，返回plot_result
-        plot_result_service.update(plot_result)
-
-        return plot_result.plot_result_id
-    else:
-        logger.info("绘图成功，fig对象: {0}".format(fig))
-
-    # 第三步，存储图表
-    try:
-        plot_picture_path = plotting_util.plot_storage(fig, plot_result.plot_result_id)
-    except Exception as err:
-        logger.error("图片保存失败，错误原因: {0}".format(err))
-        plot_result.plot_result_state = 3
-
-        # 第三步执行失败，更新记录，返回plot_result
-        plot_result_service.update(plot_result)
-
-        return plot_result
-    else:
-        logger.info("图片保存成功")
-        plot_result.plot_result_finish_date_time = DATE_TIME_NOW
-        plot_result.plot_result_local_path = plot_picture_path
-
-    # 第四步，上传图表
-    minio_util = MinioUtil()
-    plot_remote_url = minio_util.upload_file(plot_picture_path)
-    if plot_remote_url:
-        logger.info("图片上传成功，remote url: {0}".format(plot_remote_url))
-        plot_result.plot_result_upload_date_time = DATE_TIME_NOW
-        plot_result.plot_result_url = MINIO_SERVER_ADDRESS + plot_remote_url
-    else:
-        logger.error("图片上传失败")
-        plot_result.plot_result_state = 4
-
-        # 第四步失败，更新记录，返回plot_result
-        plot_result_service.update(plot_result)
-
-        return plot_result
-
-    # 最后，全部步骤执行通过，更新记录，返回plot_result
-    plot_result.plot_result_state = 0
-    plot_result_service.update(plot_result)
-
-    return plot_result
+    convert_string_list = ['{0}:{1}'.format(item, PLOT_INDEX_TYPE_DICT[item]) for item in plotting_type_list]
+    return ','.join(convert_string_list)
 
 
-def plot_catalog_time_num(access_log_id: str,
-                          time_data_list: list,
-                          catalog_num_data_dict: dict,
-                          plot_title: str) -> PlotResult | None:
+def _convert_plotting_type_str_2_list(plotting_type_str: str) -> list:
     """
-    绘制 类别-时间-数字 类型的图表
-
-    `time_data_list`:
-    [time1, time2, time3, time4]
-    `catalog_num_data_dict`:
-    {
-        catalog1: [num1, num2, num3, num4],
-        catalog2: [num1, num2, num3, num4],
-        catalog3: [num1, num2, num3, num4]
-    }
-
-    :return: plot_result | None
+    '1:折线图,2:柱状图,3:条形图,4:饼状图,5:雷达图' -> ['1', '2', '3', '4', '5']
     """
-    # 1. 创建plot_result
-    plot_result = plot_result_service.create(PlotResult(access_log_id=access_log_id))
+    return [item.split(':')[0] for item in plotting_type_str.split(',')]
 
-    if plot_result is None:
-        return None
 
-    # 2. 绘图步骤
-    # 第一步，循环判断每个catalog对应的num_data_list
-    for catalog in catalog_num_data_dict.keys():
-        if len(time_data_list) != len(catalog_num_data_dict[catalog]):
-            plot_result.plot_result_state = 1
+def check_plot_type(access_log: AccessLog,
+                    data_source_1: list | dict,
+                    data_source_2: list | dict) -> AccessLog:
+    """
+    分析两个数据源可以绘制哪些图表
+    """
 
-            # 第一步判断失败，更新记录，返回plot_result
-            plot_result_service.update(plot_result)
+    # 生成两个数据源对象
+    plot_data_source_1_object = plotting_engine.PlotDataSource(data_source_1)
+    plot_data_source_2_object = plotting_engine.PlotDataSource(data_source_2)
 
-            return plot_result
+    # 判断数据源是否有效
+    if not plot_data_source_1_object.is_data_valid or not plot_data_source_2_object.is_data_valid:
+        logger.error("数据源结构无效，无法绘图")
+        access_log.access_plot_flag = 1
+        return access_log
 
-    # 第二步，根据catalog_num的数量，选择图表，调用相应函数绘图
-    try:
-        if len(catalog_num_data_dict) <= 3:
-            fig = draw_plot_column.draw_time_catalog_num_column(time_data_list, catalog_num_data_dict, plot_title)
-            plot_result.plot_result_type = 'column'
-        else:
-            fig = draw_plot_line.draw_time_catalog_num_line(time_data_list, catalog_num_data_dict, plot_title)
-            plot_result.plot_result_type = 'line'
-    except Exception as err:
-        logger.error("绘图失败，错误原因: {0}".format(err))
-        plot_result.plot_result_state = 2
+    # 判断两个数据源的长度是否一致，不一致则无法绘图
+    if plot_data_source_1_object.data_source_length != plot_data_source_2_object.data_source_length:
+        logger.error("两个数据源长度不一致，无法绘图")
+        access_log.access_plot_flag = 2
+        return access_log
 
-        # 第二步执行失败，更新记录，返回plot_result
-        plot_result_service.update(plot_result)
+    # 分析两个数据源的类型
+    two_data_source_type_set = {plot_data_source_1_object.data_source_type, plot_data_source_2_object.data_source_type}
+    # 分析两个数据源的数据类型
+    two_data_type_set = {plot_data_source_1_object.data_type, plot_data_source_2_object.data_type}
 
-        return plot_result
-    else:
-        logger.info("绘图成功，fig对象: {0}".format(fig))
+    # 以下是 判断数据源类型 的逻辑
+    if two_data_source_type_set == {'list'}:  # 当数据源是两个列表
+        # 判断数据类型
+        if two_data_type_set == {'datetime', 'number'}:  # 时间-数字类型
+            access_log.access_plot_flag = 0
+            access_log.access_plot_type = _convert_plotting_type_list_2_str(['1', '2'])
+            access_log_service.update(access_log)
+            return access_log
+        elif two_data_type_set == {'catalog', 'number'}:  # 类别-数字类型
+            access_log.access_plot_flag = 0
+            access_log.access_plot_type = _convert_plotting_type_list_2_str(['1', '2', '3', '4', '5'])
+            access_log_service.update(access_log)
+            return access_log
+        else:  # 其他类型
+            logger.error("{0}类型数据无法绘图".format(two_data_type_set))
+            access_log.access_plot_flag = 3
+            access_log_service.update(access_log)
+            return access_log
+    elif two_data_source_type_set == {'list', 'dict'}:  # 当数据源是一个列表一个字典
+        dict_data_source = data_source_1 if plot_data_source_1_object.data_source_type == 'dict' else plot_data_source_2_object
 
-    # 第三步，存储图表
-    try:
-        plot_picture_path = plotting_util.plot_storage(fig, plot_result.plot_result_id)
-    except Exception as err:
-        logger.error("图片保存失败，错误原因: {0}".format(err))
-        plot_result.plot_result_state = 3
-
-        # 第三步执行失败，更新记录，返回plot_result
-        plot_result_service.update(plot_result)
-
-        return plot_result
-    else:
-        logger.info("图片保存成功")
-        plot_result.plot_result_finish_date_time = DATE_TIME_NOW
-        plot_result.plot_result_local_path = plot_picture_path
-
-    # 第四步，上传图表
-    minio_util = MinioUtil()
-    plot_remote_url = minio_util.upload_file(plot_picture_path)
-    if plot_remote_url:
-        logger.info("图片上传成功，remote url: {0}".format(plot_remote_url))
-        plot_result.plot_result_upload_date_time = DATE_TIME_NOW
-        plot_result.plot_result_url = MINIO_SERVER_ADDRESS + plot_remote_url
-    else:
-        logger.error("图片上传失败")
-        plot_result.plot_result_state = 4
-
-        # 第四步失败，更新记录，返回plot_result
-        plot_result_service.update(plot_result)
-
-        return plot_result
-
-    # 最后，全部步骤执行通过，更新记录，返回plot_result
-    plot_result.plot_result_state = 0
-    plot_result_service.update(plot_result)
-
-    return plot_result
-
-# -----------------------------------------------------
-# 示例绘图功能 （结束）
-# 等待业务绘图功能基本开发完毕后，删除以上这些
-# -----------------------------------------------------
+        # 判断字典数据源的长度
+        if dict_data_source.dict_data_source_key_length <= 3:  # 字典数据源长度小于3
+            access_log.access_plot_flag = 0
+            access_log.access_plot_type = _convert_plotting_type_list_2_str(['7'])
+            access_log_service.update(access_log)
+            return access_log
+        else:  # 字典数据源长度大于3
+            access_log.access_plot_flag = 0
+            access_log.access_plot_type = _convert_plotting_type_list_2_str(['6'])
+            access_log_service.update(access_log)
+            return access_log
+    else:  # 其他数据源
+        logger.error("{0}类型数据源无法绘图".format(two_data_source_type_set))
+        access_log.access_plot_flag = 1
+        access_log_service.update(access_log)
+        return access_log

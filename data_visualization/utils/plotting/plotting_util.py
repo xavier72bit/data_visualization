@@ -20,3 +20,4 @@ def plot_storage(figure, file_name: str) -> str | int:
         return 2
     else:
         return file_path + '.png'
+

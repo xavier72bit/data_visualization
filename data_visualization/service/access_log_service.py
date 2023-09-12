@@ -1,3 +1,5 @@
+from loguru import logger
+from project_common import DATE_TIME_NOW
 from data_visualization.dao import access_log_dao
 from data_visualization.utils.do.data_object import AccessLog
 from data_visualization.utils.do.data_object_util import general_primary_key
@@ -16,6 +18,9 @@ def create(access_log: AccessLog) -> AccessLog | None:
     # 设置主键ID
     access_log.access_log_id = general_primary_key()
 
+    # 设置访问时间
+    access_log.access_date_time = DATE_TIME_NOW
+
     # 插入操作
     insert_result = access_log_dao.insert(access_log)
 
@@ -24,3 +29,40 @@ def create(access_log: AccessLog) -> AccessLog | None:
         return access_log
     else:
         return None
+
+
+def update(access_log: AccessLog) -> bool:
+    """
+    更新access_log信息，在这里进行 AccessLog.access_plot_type 列表转字符串 操作
+
+    :return: 成功True，失败False。
+    """
+    # 验证主键值非空
+    if access_log.access_log_id is None:
+        return False
+
+    # 验证传入的access_log在数据库中是否有记录
+    old_access_log = access_log_dao.select_one(access_log)
+    if old_access_log is None:
+        return False
+
+    # 更新操作
+    update_result = access_log_dao.update(access_log)
+
+    if update_result:
+        return True
+    else:
+        return False
+
+
+def read_one(access_log: AccessLog) -> AccessLog | None:
+    """
+    读取一条access_log信息，在这里进行 AccessLog.access_plot_type 字符串转列表 操作
+
+    :return: 成功AccessLog，失败None
+    """
+    # 验证主键值非空
+    if access_log.access_log_id is None:
+        return None
+
+    return access_log_dao.select_one(access_log)

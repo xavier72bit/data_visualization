@@ -1,3 +1,4 @@
+from loguru import logger
 import matplotlib.pyplot as plt
 
 # -----------------------------------------------------
@@ -16,13 +17,20 @@ plt.rc('font', **font_rc)
 # 绘图功能函数
 # -----------------------------------------------------
 
-def draw_catalog_num_pie(catalog_data_list, num_data_list, plot_title) -> plt.Figure:
+def draw_pie(ax,
+             data_list_x: list,
+             data_list_y: list,
+             plot_title: str) -> bool:
     """
-    绘制 类别-数字 饼状图
+    绘制饼状图
+
+    `plotting_engine.plot_index_dict[4]`
     """
-    fig, ax = plt.subplots()
-
-    ax.set_title(plot_title)
-    ax.pie(num_data_list, labels=catalog_data_list)
-
-    return fig
+    try:
+        ax.pie(data_list_y, labels=data_list_x)
+        ax.set_title(plot_title)
+    except Exception as plot_err:
+        logger.error("draw_pie绘图失败，错误原因：{0}".format(plot_err))
+        return False
+    else:
+        return True

@@ -44,3 +44,8 @@ minio:
   user: admin
   password: you_password
   enable_https: False
+
+
+## fastdfs配置
+fastdfs:
+  server-url: https://example.com

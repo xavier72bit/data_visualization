@@ -7,8 +7,9 @@ class AccessLog:
     access_date_time: str | None = None
     access_ip: str | None = None
     access_url: str | None = None
-    access_body: str | None = None
+    access_param: str | None = None
     access_plot_type: str | None = None
+    access_plot_flag: int | None = None
 
 
 @dataclass

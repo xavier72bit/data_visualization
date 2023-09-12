@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint, request, jsonify
 
 from data_visualization.stream import plot_stream
@@ -14,6 +15,7 @@ plot_api = Blueprint('plot_api', __name__)
 # 绘图状态定义
 # -----------------------------------------------------
 
+# 绘图状态
 plot_state_dict = {
     0: '绘图成功',
     1: '数据序列长度不一致',
@@ -22,97 +24,48 @@ plot_state_dict = {
     4: '图片上传失败'
 }
 
+# 数据校验状态
+data_state_dict = {
+    0: '数据正常',
+    1: '数据源结构无效',
+    2: '两个数据序列长度不一致',
+    3: '数据类型无效'
+}
+
+
 # -----------------------------------------------------
 # 业务API
 # -----------------------------------------------------
 
+
 @plot_api.route('/data/source', methods=['POST'])
-def get_user_plot_data_source():
-    """
-    获取用户的绘图数据
-
-    """
-
-
-# -----------------------------------------------------
-# 示例API （开始）
-# 等待业务API基本开发完毕后，删除以下这些
-# -----------------------------------------------------
-
-@plot_api.route('/source/two', methods=['POST'])
-def plot_time_num_with_source():
-    # 记录请求
-    access_log = access_log_service.create(AccessLog(access_ip=request.remote_addr,
-                                                     access_token='zanshimeiyoutoken',
-                                                     access_log_message='zanshibuzhidaotiansha'))
-
+def commit_data_source():
     # 接收json数据
     json_data = request.get_json()
 
-    time_data_list = json_data['time_data_list']
-    num_data_list = json_data['num_data_list']
-    plot_title = json_data['plot_title']
-
-    # 绘图
-    plot_result = plot_stream.plot_time_num(access_log_id=access_log.access_log_id,
-                                            time_data_list=time_data_list,
-                                            num_data_list=num_data_list,
-                                            plot_title=plot_title)
-
-    # 判断绘图是否成功
-    if plot_result is None:
-        res_data = {
-            'code': 10000,
-            'msg': 'plot_result创建失败',
-            'data': None
-        }
-    else:
-        res_data = {
-            'code': plot_result.plot_result_state,
-            'msg': plot_state_dict[plot_result.plot_result_state],
-            'data': None if plot_result.plot_result_state else plot_result.plot_result_url
-        }
-
-    return jsonify(res_data)
-
-
-@plot_api.route('/source/three', methods=['POST'])
-def plot_catalog_time_num_with_source():
     # 记录请求
     access_log = access_log_service.create(AccessLog(access_ip=request.remote_addr,
-                                                     access_token='zanshimeiyoutoken',
-                                                     access_log_message='zanshibuzhidaotiansha'))
+                                                     access_url=request.url,
+                                                     access_param=json.dumps(json_data)))
 
-    # 接收json数据
-    json_data = request.get_json()
+    # 提取绘图数据源
+    data_source_1 = json_data['data_source_1']
+    data_source_2 = json_data['data_source_2']
 
-    time_data_list = json_data['time_data_list']
-    catalog_num_data_dict = json_data['catalog_num_data_dict']
-    plot_title = json_data['plot_title']
+    # 校验数据
+    result_access_log = plot_stream.check_plot_type(access_log, data_source_1, data_source_2)
 
-    # 绘图
-    plot_result = plot_stream.plot_catalog_time_num(access_log_id=access_log.access_log_id,
-                                                    time_data_list=time_data_list,
-                                                    catalog_num_data_dict=catalog_num_data_dict,
-                                                    plot_title=plot_title)
-
-    # 判断绘图是否成功
-    if plot_result is None:
+    if result_access_log.access_plot_flag == 0:  # 检查通过，可以绘图
         res_data = {
-            'code': 10000,
-            'msg': 'plot_result创建失败',
-            'data': None
+            'code': result_access_log.access_plot_flag,
+            'msg': result_access_log.access_plot_type,
+            'data': result_access_log.access_log_id
         }
     else:
         res_data = {
-            'code': plot_result.plot_result_state,
-            'msg': plot_state_dict[plot_result.plot_result_state],
-            'data': None if plot_result.plot_result_state else plot_result.plot_result_url
+            'code': result_access_log.access_plot_flag,
+            'msg': data_state_dict[result_access_log.access_plot_flag],
+            'data': None
         }
 
     return jsonify(res_data)
-
-# -----------------------------------------------------
-# 示例API （结束）
-# 等待业务API基本开发完毕后，删除以上这些
-# -----------------------------------------------------

@@ -1,5 +1,7 @@
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib as mpl
+from loguru import logger
+import matplotlib.pyplot as plt
 
 # -----------------------------------------------------
 # 定义字体
@@ -17,58 +19,76 @@ plt.rc('font', **font_rc)
 # 绘图功能函数
 # -----------------------------------------------------
 
-def draw_time_num_column(time_data_list, num_data_list, plot_title) -> plt.Figure:
+def draw_one_column(ax,
+                    data_list_x: list,
+                    data_list_y: list,
+                    plot_title: str,
+                    is_xa_time: bool) -> bool:
     """
-    绘制 时间-数字 柱状图
+    绘制柱状图
+
+    `plotting_engine.plot_index_dict[2]`
     """
     # 设置每个“柱”的宽度
     width = 0.3
+    try:
+        ax.set_title(plot_title)
+        ax.bar(data_list_x, data_list_y, width)
 
-    fig, ax = plt.subplots()
+        # 判断横轴是不是datetime类型
+        if is_xa_time:
+            # 使用针对Date类型优化的特殊Formatter
+            cdf = mpl.dates.ConciseDateFormatter(ax.xaxis.get_major_locator())
+            ax.xaxis.set_major_formatter(cdf)
+    except Exception as plot_err:
+        logger.error("draw_one_column绘图失败，错误原因：{0}".format(plot_err))
+        return False
+    else:
+        return True
 
-    ax.set_title(plot_title)
-    ax.bar(time_data_list, num_data_list, width)
 
-    return fig
-
-
-def draw_catalog_num_column(catalog_data_list, num_data_list, plot_title) -> plt.Figure:
+def draw_multi_column(ax,
+                      data_list_x: list,
+                      data_dict_y: dict,
+                      plot_title: str,
+                      is_xa_time: bool) -> bool:
     """
-    绘制 类别-数字 柱状图
-    """
-    fig, ax = plt.subplots()
+    绘制并列柱状图
 
-    ax.set_title(plot_title)
-    ax.bar(catalog_data_list, num_data_list)
-
-    return fig
-
-
-def draw_time_catalog_num_column(time_data_list, catalog_num_dict, plot_title) -> plt.Figure:
-    """
-    绘制 时间-类别-数字 并列柱状图
+    `plotting_engine.plot_index_dict[7]`
     """
     # 设定x轴
-    x = np.arange(len(time_data_list))
+    x_aix = np.arange(len(data_list_x))
     # 每个“柱”的宽度
     width = 0.2
     multiplier = 0
 
-    fig, ax = plt.subplots(layout='constrained')
+    try:
+        # 绘制并列柱状图
+        for catalog, num in data_dict_y.items():
+            # 绘制偏移量
+            offset = width * multiplier
+            # 绘制数据
+            rects = ax.bar(x_aix + offset, num, width, label=catalog)
+            ax.bar_label(rects, padding=3)
+            multiplier += 1
 
-    for catalog, num in catalog_num_dict.items():
-        # 绘制偏移量
-        offset = width * multiplier
-        # 绘制数据
-        rects = ax.bar(x + offset, num, width, label=catalog)
-        ax.bar_label(rects, padding=3)
-        multiplier += 1
+        # 设置绘图标题
+        ax.set_title(plot_title)
 
-    # 设置绘图标题
-    ax.set_title(plot_title)
-    # 设置横坐标刻度值
-    ax.set_xticks(x + width, time_data_list)
-    # 设置图例
-    ax.legend(loc='upper left', ncols=len(catalog_num_dict.keys()))
+        # 设置横坐标刻度值
+        ax.set_xticks(x_aix + width, data_list_x)
 
-    return fig
+        # 设置图例
+        ax.legend(loc='upper left', ncols=len(data_dict_y.keys()))
+
+        # 判断横轴是不是datetime类型
+        if is_xa_time:
+            # 使用针对Date类型优化的特殊Formatter
+            cdf = mpl.dates.ConciseDateFormatter(ax.xaxis.get_major_locator())
+            ax.xaxis.set_major_formatter(cdf)
+    except Exception as plot_err:
+        logger.error("draw_multi_column绘图失败，错误原因：{0}".format(plot_err))
+        return False
+    else:
+        return True

@@ -1,5 +1,10 @@
 import datetime
+from loguru import logger
+import matplotlib.pyplot as plt
 
+from data_visualization.utils.plotting.plotting_functions import draw_plot_column, draw_plot_line, draw_plot_pie, draw_plot_bar, draw_plot_radar
+
+# 日期时间字符串解析格式
 datetime_format_string_tuple = (
     '%Y-%m-%d %H:%M:%S',
     '%Y/%m/%d %H:%M:%S',
@@ -69,28 +74,21 @@ class PlotDataSource:
     data_type: str | None = None
     # 数据源是否有效（当为字典数据源时，所有的value列表的长度相同才为True）
     is_data_valid: bool = False
+    # 字典数据源的keys()长度
+    dict_data_source_key_length: int = 0
 
     def __init__(self, data: dict | list | None):
         """
         直接将数据传进来，分析数据源在这里进行
         """
-        # -----------------------------------------------------
-        # 1. 先存储数据
-        # -----------------------------------------------------
-
+        # 第一步：先存储数据
         self.data = data
 
-        # -----------------------------------------------------
-        # 2. 判定数据源是否为空
-        # -----------------------------------------------------
-
+        # 第二步：判定数据源是否为空
         if self.data is None:
             self.is_data_valid = False
 
-        # -----------------------------------------------------
-        # 3. 判断数据源类型，同时判断数据源是否有效
-        # -----------------------------------------------------
-
+        # 第三步：判断数据源类型，同时判断数据源是否有效
         if type(self.data) is list:  # 当数据源为list
             self.data_source_type = 'list'
             self.data_source_length = len(self.data)
@@ -109,17 +107,15 @@ class PlotDataSource:
 
                 if len(dict_data_source_length_set) == 1:  # 相同，继续判断数据源长度
                     self.data_source_length = dict_data_source_length_set.pop()
+                    self.dict_data_source_key_length = len(self.data)
                     self.is_data_valid = False if self.data_source_length == 0 else True
                 else:  # 不相同，设置数据源无效
                     self.is_data_valid = False
 
-        else: # 其他数据类型的数据源无效
+        else:  # 其他数据类型的数据源无效
             self.is_data_valid = False
 
-        # -----------------------------------------------------
-        # 4. 判断并校验数据源中的数据类型
-        # -----------------------------------------------------
-
+        # 第四步：判断并校验数据源中的数据类型
         if self.data_source_type == 'list' and self.is_data_valid:  # 当数据源为list
             list_data_type_set = {type(item) for item in self.data}
 

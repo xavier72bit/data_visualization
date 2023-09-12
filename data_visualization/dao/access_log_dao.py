@@ -9,14 +9,15 @@ def insert(access_log: AccessLog) -> int:
     :return: 操作影响行数
     :rtype: int
     """
-    sql = 'INSERT INTO access_log (access_log_id, access_date_time, access_ip, access_url, access_body, access_plot_type) VALUES (%s, %s, %s, %s, %s, %s);'
+    sql = 'INSERT INTO access_log (access_log_id, access_date_time, access_ip, access_url, access_param, access_plot_type, access_plot_flag) VALUES (%s, %s, %s, %s, %s, %s, %s);'
     args = (
         access_log.access_log_id,
         access_log.access_date_time,
         access_log.access_ip,
         access_log.access_url,
-        access_log.access_body,
-        access_log.access_plot_type
+        access_log.access_param,
+        access_log.access_plot_type,
+        access_log.access_plot_flag
     )
 
     with MysqlUtil() as mu:
@@ -50,14 +51,15 @@ def update(access_log: AccessLog) -> int:
     :return: 操作影响行数
     :rtype: int
     """
-    sql = 'UPDATE access_log SET access_log_id = %s, access_date_time = %s, access_ip = %s, access_url = %s, access_body = %s, access_plot_type = %s WHERE access_log_id = %s;'
+    sql = 'UPDATE access_log SET access_log_id = %s, access_date_time = %s, access_ip = %s, access_url = %s, access_param = %s, access_plot_type = %s, access_plot_flag = %s WHERE access_log_id = %s;'
     args = (
         access_log.access_log_id,
         access_log.access_date_time,
         access_log.access_ip,
         access_log.access_url,
-        access_log.access_body,
+        access_log.access_param,
         access_log.access_plot_type,
+        access_log.access_plot_flag,
         access_log.access_log_id
     )
 
@@ -74,7 +76,7 @@ def select_one(access_log: AccessLog) -> AccessLog | None:
     :return: AccessLog对象
     :rtype: dict | None
     """
-    sql = 'SELECT access_log_id, access_date_time, access_ip, access_url, access_body, access_plot_type FROM access_log WHERE access_log_id = %s LIMIT 0, 1;'
+    sql = 'SELECT access_log_id, access_date_time, access_ip, access_url, access_param, access_plot_type, access_plot_flag FROM access_log WHERE access_log_id = %s LIMIT 0, 1;'
     args = (
         access_log.access_log_id,
     )
@@ -97,7 +99,7 @@ def select_list_by_access_ip(access_log: AccessLog) -> list[AccessLog] | None:
     :return: 包含多个AccessLog数据对象的列表
     :rtype: list[AccessLog] | None
     """
-    sql = 'SELECT access_log_id, access_date_time, access_ip, access_url, access_body, access_plot_type FROM access_log WHERE access_ip LIKE %s;'
+    sql = 'SELECT access_log_id, access_date_time, access_ip, access_url, access_param, access_plot_type, access_plot_flag FROM access_log WHERE access_ip LIKE %s;'
     args = (
         access_log.access_ip,
     )

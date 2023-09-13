@@ -29,7 +29,8 @@ data_state_dict = {
     0: '数据正常',
     1: '数据源结构无效',
     2: '两个数据序列长度不一致',
-    3: '数据类型无效'
+    3: '数据类型无效',
+    4: '缺少数据源'
 }
 
 
@@ -41,20 +42,29 @@ data_state_dict = {
 @plot_api.route('/data/source', methods=['POST'])
 def commit_data_source():
     # 接收json数据
-    json_data = request.get_json()
-
-    # TODO: 校验一下json的key是否符合要求
+    json_data: dict = request.get_json()
 
     # 记录请求
     access_log = access_log_service.create(AccessLog(access_ip=request.remote_addr,
                                                      access_url=request.url,
                                                      access_param=json.dumps(json_data)))
 
+    # 校验json数据
+    if not ('data_source_1' in json_data.keys() and 'data_source_2' in json_data.keys()):
+        access_log.access_plot_flag = 4
+        access_log_service.update(access_log)
+        res_data = {
+            'code': access_log.access_plot_flag,
+            'msg': data_state_dict[access_log.access_plot_flag],
+            'data': None
+        }
+        return jsonify(res_data)
+
     # 提取绘图数据源
     data_source_1 = json_data['data_source_1']
     data_source_2 = json_data['data_source_2']
 
-    # 校验数据
+    # 判断绘图种类
     result_access_log = plot_stream.check_plot_type(access_log, data_source_1, data_source_2)
 
     if result_access_log.access_plot_flag == 0:  # 检查通过，可以绘图
@@ -71,3 +81,8 @@ def commit_data_source():
         }
 
     return jsonify(res_data)
+
+
+@plot_api.route('/plot', methods=['POST'])
+def data_source_plot():
+    pass

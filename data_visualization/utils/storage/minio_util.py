@@ -7,6 +7,11 @@ from data_visualization.utils import config_util
 from project_common import FILE_CONTENT_TYPE_DICT
 
 
+# -----------------------------------------------------
+# MinIO工具类
+# -----------------------------------------------------
+
+
 class MinioUtil:
     minio_bucket_name = "py-data-visualization"
     minio_bucket_policy_dict = config_util.read_json('minio_bucket_policy_anyone_readonly.json')
@@ -49,7 +54,7 @@ class MinioUtil:
 
     def upload_file(self, file_path: str) -> str | None:
         """
-        上传文件到minio，返回文件URL后缀
+        上传文件到minio，返回文件URL
         """
         object_name = os.path.split(file_path)[-1]
         object_content_type = FILE_CONTENT_TYPE_DICT[os.path.split(file_path)[-1].split(".")[-1]]
@@ -70,4 +75,4 @@ class MinioUtil:
             logger.info("上传文件成功，已创建{0}对象，etag：{1}，content-type：{2}"
                         .format(upload_result.object_name, upload_result.etag, object_content_type))
 
-            return '/'.join([self.minio_bucket_name, object_name])
+            return '/'.join([self.minio_client_config["endpoint"], self.minio_bucket_name, object_name])

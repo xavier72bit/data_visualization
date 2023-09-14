@@ -1,11 +1,17 @@
 import datetime
-from loguru import logger
 import matplotlib.pyplot as plt
 
+from data_visualization.utils.plotting import plotting_util
 from data_visualization.utils.plotting.plotting_functions import draw_plot_column, draw_plot_line, draw_plot_pie, draw_plot_bar, draw_plot_radar
 
+
+# -----------------------------------------------------
+# 本模块内部使用的常量
+# -----------------------------------------------------
+
+
 # 日期时间字符串解析格式
-datetime_format_string_tuple = (
+_datetime_format_string_tuple = (
     '%Y-%m-%d %H:%M:%S',
     '%Y/%m/%d %H:%M:%S',
     '%Y-%m-%dT%H:%M:%S',
@@ -22,15 +28,36 @@ datetime_format_string_tuple = (
     '%H:%M'
 )
 
+# 绘图类型与绘图函数对照字典
+_plotting_type_function_dict = {
+    '1': draw_plot_line.draw_one_line,
+    '2': draw_plot_column.draw_one_column,
+    '3': draw_plot_bar.draw_bar,
+    '4': draw_plot_pie.draw_pie,
+    '5': draw_plot_radar.draw_radar,
+    '6': draw_plot_line.draw_multi_line,
+    '7': draw_plot_column.draw_multi_column
+}
 
-def string_2_datetime_test(test_string: str) -> str | datetime.datetime:
+# 需要用到极坐标的绘图类型元组
+_plotting_type_is_polar_axes_tuple = (
+    '5',
+)
+
+
+# -----------------------------------------------------
+# 本模块内部使用的工具函数
+# -----------------------------------------------------
+
+
+def _convert_string_2_datetime(test_string: str) -> str | datetime.datetime:
     """
     字符串转换为datetime测试，测试标准是datetime_format_string_tuple
 
     :return: 成功返回datetime.datetime类，失败返回原字符串
     """
     datetime_type_data = None
-    for datetime_format in datetime_format_string_tuple:  # 使用预定义的时间字符串格式化模版解析
+    for datetime_format in _datetime_format_string_tuple:  # 使用预定义的时间字符串格式化模版解析
         try:
             datetime_type_data = datetime.datetime.strptime(test_string, datetime_format)
 
@@ -41,6 +68,11 @@ def string_2_datetime_test(test_string: str) -> str | datetime.datetime:
 
     if datetime_type_data is None:
         return test_string
+
+
+# -----------------------------------------------------
+# 绘图数据源类
+# -----------------------------------------------------
 
 
 class PlotDataSource:
@@ -124,7 +156,7 @@ class PlotDataSource:
                 self.is_data_valid = True
 
             elif list_data_type_set == {str}:  # list_data_type_set 是 {str}
-                self.data = list(map(string_2_datetime_test, self.data))  # 执行一次datetime转换
+                self.data = list(map(_convert_string_2_datetime, self.data))  # 执行一次datetime转换
 
                 # 再次检查字符串数据源中的数据类型
                 str_type_set = {type(item) for item in self.data}
@@ -152,3 +184,61 @@ class PlotDataSource:
                 self.is_data_valid = True
             else:
                 self.is_data_valid = False
+
+
+# -----------------------------------------------------
+# 绘图引擎核心函数
+# -----------------------------------------------------
+
+
+def plotting_picture(data_source_1: list | dict,
+                     data_source_2: list | dict,
+                     plotting_requirement_list: list,
+                     picture_file_name: str) -> str | int:
+    """
+    传入两个数据源和数据绘图需求列表['1', '2', '3']，执行绘图过程
+
+    错误码：1-绘图失败，2-图片保存失败
+    :return: 成功：绘图结果的本地路径，失败：错误码
+    """
+    # 存储数据
+    plot_data_source_1_object = PlotDataSource(data_source_1)
+    plot_data_source_2_object = PlotDataSource(data_source_2)
+
+    # 1. 生成画布
+    fig: plt.Figure = plt.figure()
+
+    # 2. 分析数据源中的数据类型
+    is_xa_time = True if plot_data_source_1_object.data_type == 'datetime' or plot_data_source_2_object.data_type == 'datetime' else False
+
+    # 3. 生成坐标系
+    axes_number: int = len(plotting_requirement_list)
+
+    # TODO: 暂定坐标系都放同一排
+    axes_list: list = []
+    for index, plot_type in zip(range(axes_number), plotting_requirement_list):
+        # index从1开始
+        index += 1
+
+        # 判定是否需要生成极坐标系
+        if plot_type in _plotting_type_is_polar_axes_tuple:
+            axes_list.append(fig.add_subplot(1, axes_number, index, projection='polar'))
+        else:
+            axes_list.append(fig.add_subplot(1, axes_number, index))
+
+    # 4. 对各坐标系应用绘图函数
+    for axes, plot_type in zip(axes_list, plotting_requirement_list):
+        plot_result = _plotting_type_function_dict[plot_type](axes,
+                                                              plot_data_source_1_object.data,
+                                                              plot_data_source_2_object.data,
+                                                              is_xa_time=is_xa_time)
+        if not plot_result:  # 绘图不成功
+            return 1
+
+    # 5. 绘图存储
+    plot_storage_result = plotting_util.plot_storage(fig, picture_file_name)
+
+    if plot_storage_result is None:  # 图片存储不成功
+        return 2
+    else:
+        return plot_storage_result

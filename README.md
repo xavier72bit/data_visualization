@@ -200,3 +200,85 @@ POST http://127.0.0.1:5001/plot/source/two
     "msg": "数据源结构无效"
 }
 ```
+
+### 3. 绘图
+
+向绘图接口提交两个参数：
+
+1. plot_key: 提供数据源接口返回的plot_key
+```json
+{
+    "code": 0,
+    "data": "f9754f3e-723b-4cf7-938a-214c4f9eedcf",   <-----这个就是plot_key
+    "msg": "7:并列柱状图"
+}
+```
+
+2. plot_requirement_list: 绘图要求列表，形式如下
+
+* `[]`
+* `['1']`
+* `['1', '2', '3']`
+
+##### 示例1
+
+请求体
+
+```json
+{
+    "plot_key": "7548c068-a888-4bb2-a7b1-739385a60f06",
+    "plot_requirement_list": ["1","2","3"]
+}
+```
+
+响应
+
+```json
+{
+  "code": 0,
+  "data": "192.168.64.17:9001/py-data-visualization/4aa87880-78ed-4115-bf51-05ef574964d2.png",
+  "msg": "绘图成功"
+}
+```
+
+##### 示例2
+
+请求体
+
+```json
+{
+    "plot_key": "7548c068-a888-4bb2-a7b1-739385a60f06",
+    "plot_requirement_list": []
+}
+```
+
+响应
+
+```json
+{
+    "code": 500,
+    "data": null,
+    "msg": "请求数据无效"
+}
+```
+
+##### 示例3
+
+请求体
+
+```json
+{
+    "plot_key": "",
+    "plot_requirement_list": ["1"]
+}
+```
+
+响应
+
+```json
+{
+    "code": 500,
+    "data": null,
+    "msg": "plot_key无效"
+}
+```

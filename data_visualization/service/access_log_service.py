@@ -1,4 +1,3 @@
-from loguru import logger
 from project_common import DATE_TIME_NOW
 from data_visualization.dao import access_log_dao
 from data_visualization.utils.do.data_object import AccessLog

@@ -4,15 +4,15 @@ from data_visualization.utils.do.data_object import PlotResult
 from data_visualization.utils.do.data_object_util import general_primary_key
 
 
-def create(plot_result: PlotResult) -> PlotResult | bool:
+def create(plot_result: PlotResult) -> PlotResult | None:
     """
     创建一个新的plot_result并插入数据库。
 
-    :return: 成功plot_result，失败False。
+    :return: 成功plot_result，失败None。
     """
     # 验证access_log_id非空
     if plot_result.access_log_id is None:
-        return False
+        return None
 
     # 设置主键ID
     plot_result.plot_result_id = general_primary_key()
@@ -24,7 +24,7 @@ def create(plot_result: PlotResult) -> PlotResult | bool:
     if insert_result:
         return plot_result
     else:
-        return False
+        return None
 
 
 def delete(plot_result: PlotResult) -> bool:

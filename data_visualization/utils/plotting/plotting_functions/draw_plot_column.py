@@ -19,20 +19,28 @@ plt.rc('font', **font_rc)
 # 绘图功能函数
 # -----------------------------------------------------
 
-def draw_one_column(ax,
-                    data_list_x: list,
-                    data_list_y: list,
-                    plot_title: str,
-                    is_xa_time: bool) -> bool:
+def draw_one_column(ax: plt.Axes, data_list_x: list, data_list_y: list, **kwargs) -> bool:
     """
     绘制柱状图
 
-    `plotting_engine.plot_index_dict[2]`
+    :param ax: 绘图坐标系
+    :param data_list_x: x轴数据列表
+    :param data_list_y: y轴数据列表
+    :param kwargs: 其他绘图选项(关键字参数)
+    :return: 绘图操作是否成功
+
+    其他的绘图选项：
+        1. is_xa_time: bool: 横轴是否为datetime类型
     """
+    # 先分析其他绘图选项
+    try:
+        is_xa_time = kwargs['is_xa_time']
+    except KeyError:
+        is_xa_time = False
+
     # 设置每个“柱”的宽度
     width = 0.3
     try:
-        ax.set_title(plot_title)
         ax.bar(data_list_x, data_list_y, width)
 
         # 判断横轴是不是datetime类型
@@ -47,16 +55,25 @@ def draw_one_column(ax,
         return True
 
 
-def draw_multi_column(ax,
-                      data_list_x: list,
-                      data_dict_y: dict,
-                      plot_title: str,
-                      is_xa_time: bool) -> bool:
+def draw_multi_column(ax: plt.Axes, data_list_x: list, data_dict_y: dict, **kwargs) -> bool:
     """
     绘制并列柱状图
 
-    `plotting_engine.plot_index_dict[7]`
+    :param ax: 绘图坐标系
+    :param data_list_x: x轴数据列表
+    :param data_dict_y: 多个y轴数据列表组成的字典
+    :param kwargs: 其他绘图选项(关键字参数)
+    :return: 绘图操作是否成功
+
+    其他的绘图选项：
+        1. is_xa_time: bool: 横轴是否为datetime类型
     """
+    # 先分析其他绘图选项
+    try:
+        is_xa_time = kwargs['is_xa_time']
+    except KeyError:
+        is_xa_time = False
+
     # 设定x轴
     x_aix = np.arange(len(data_list_x))
     # 每个“柱”的宽度
@@ -73,9 +90,6 @@ def draw_multi_column(ax,
             ax.bar_label(rects, padding=3)
             multiplier += 1
 
-        # 设置绘图标题
-        ax.set_title(plot_title)
-
         # 设置横坐标刻度值
         ax.set_xticks(x_aix + width, data_list_x)
 
@@ -83,7 +97,7 @@ def draw_multi_column(ax,
         ax.legend(loc='upper left', ncols=len(data_dict_y.keys()))
 
         # 判断横轴是不是datetime类型
-        if is_xa_time:
+        if kwargs['is_xa_time']:
             # 使用针对Date类型优化的特殊Formatter
             cdf = mpl.dates.ConciseDateFormatter(ax.xaxis.get_major_locator())
             ax.xaxis.set_major_formatter(cdf)

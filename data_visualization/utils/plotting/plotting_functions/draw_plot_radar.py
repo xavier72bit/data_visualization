@@ -17,14 +17,18 @@ plt.rc('font', **font_rc)
 # 绘图功能函数
 # -----------------------------------------------------
 
-def draw_radar(ax,
-               data_list_x: list,
-               data_list_y: list,
-               plot_title: str) -> bool:
+def draw_radar(ax: plt.PolarAxes, data_list_x: list, data_list_y: list, **kwargs) -> bool:
     """
     绘制雷达图
 
-    `plotting_engine.plot_index_dict[5]`
+    :param ax: 绘图坐标系(极坐标系)
+    :param data_list_x: 种类数据列表
+    :param data_list_y: 数字数据列表
+    :param kwargs: 其他绘图选项(关键字参数)
+    :return: 绘图操作是否成功
+
+    其他的绘图选项：
+        暂无其他绘图选项
     """
     try:
         # 设置雷达图的角度，用于平分切开一个圆面
@@ -44,10 +48,8 @@ def draw_radar(ax,
         # 添加每个特征的标签
         ax.set_thetagrids(angles * 180/np.pi, labels=catalog_list)
 
-        # 添加网格线，标题
+        # 添加网格线
         ax.grid(True)
-        ax.set_title(plot_title)
-
     except Exception as plot_err:
         print("draw_radar绘图失败，错误原因: {0}".format(plot_err))
         return False

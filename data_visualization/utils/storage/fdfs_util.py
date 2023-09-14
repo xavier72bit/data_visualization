@@ -6,6 +6,11 @@ from project_common import CURRENT_CONFIG_PATH
 from fdfs_client.client import get_tracker_conf, Fdfs_client
 
 
+# -----------------------------------------------------
+# FastDFS工具类
+# -----------------------------------------------------
+
+
 class FastdfsUtil:
     tracker_conf = get_tracker_conf(os.path.join(CURRENT_CONFIG_PATH, 'fdfs_client.conf'))
 

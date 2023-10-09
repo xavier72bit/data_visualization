@@ -2,21 +2,11 @@ import matplotlib as mpl
 from loguru import logger
 import matplotlib.pyplot as plt
 
-# -----------------------------------------------------
-# 定义字体
-# -----------------------------------------------------
-
-font_rc = {
-    'family': 'SimSun',
-    'size': '12'
-}
-
-plt.rc('font', **font_rc)
-
 
 # -----------------------------------------------------
 # 绘图功能函数
 # -----------------------------------------------------
+
 
 def draw_bar(ax: plt.Axes, data_list_x: list, data_list_y: list, **kwargs) -> bool:
     """
@@ -33,15 +23,19 @@ def draw_bar(ax: plt.Axes, data_list_x: list, data_list_y: list, **kwargs) -> bo
     其他的绘图选项：
         1. is_xa_time: bool: 横轴是否为datetime类型
     """
-    # 先分析其他绘图选项
+    # 分析is_xa_time绘图选项
     try:
         is_xa_time = kwargs['is_xa_time']
     except KeyError:
         is_xa_time = False
 
-    # 绘图
+    # 绘图过程
     try:
-        ax.barh(data_list_x, data_list_y)
+        # 绘图
+        bar_container = ax.barh(data_list_x, data_list_y)
+
+        # 加数据标注
+        ax.bar_label(bar_container, labels=data_list_y, padding=3)
 
         # 判断横轴是不是datetime类型
         if is_xa_time:

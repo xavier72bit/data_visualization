@@ -2,8 +2,9 @@ import json
 from flask import Blueprint, request, jsonify
 
 from visualization.stream import plot_stream
-from visualization.service import access_log_service
-from visualization.utils.do.data_object import AccessLog
+from project_common import CONST_PLOT_TASK_SUPPORT_FLAG_DICT, CONST_PLOT_REQUIREMENT_ERROR_MSG
+from visualization.utils.do.data_object import AccessLog, PlotTask
+from visualization.service import access_log_service, plot_task_service
 
 # -----------------------------------------------------
 # 定义flask蓝图
@@ -11,82 +12,76 @@ from visualization.utils.do.data_object import AccessLog
 
 plot_api = Blueprint('plot_api', __name__)
 
-# -----------------------------------------------------
-# 绘图状态定义
-# -----------------------------------------------------
-
-# 绘图状态
-plot_state_dict = {
-    0: '绘图成功',
-    1: '绘图失败',
-    2: '图片保存失败',
-    3: '图片上传失败'
-}
-
-# 数据校验状态
-data_state_dict = {
-    0: '数据正常',
-    1: '数据源结构无效',
-    2: '两个数据序列长度不一致',
-    3: '数据类型无效',
-    4: '缺少数据源'
-}
-
 
 # -----------------------------------------------------
 # 业务API
 # -----------------------------------------------------
 
 
-@plot_api.route('/data/source', methods=['POST'])
+@plot_api.route('2d/data/submit', methods=['POST'])
 def commit_data_source():
+    """
+    获取数据，创建绘图任务，返回绘图任务ID
+    """
     # 接收json数据
-    json_data: dict = request.get_json()
+    get_json_data: dict = request.get_json()
 
     # 记录请求
-    access_log = access_log_service.create(AccessLog(access_ip=request.remote_addr,
-                                                     access_url=request.url,
-                                                     access_param=json.dumps(json_data)))
+    access_log = access_log_service.create(
+        AccessLog(
+            access_ip=request.remote_addr,
+            access_url=request.url,
+            access_param=json.dumps(get_json_data)
+        )
+    )
 
-    # 校验json数据
-    if not ('data_source_1' in json_data.keys() and 'data_source_2' in json_data.keys()):
-        access_log.access_plot_flag = 4
-        access_log_service.update(access_log)
-        res_data = {
-            'code': access_log.access_plot_flag,
-            'msg': data_state_dict[access_log.access_plot_flag],
-            'data': None
-        }
-        return jsonify(res_data)
+    # 创建任务单
+    plot_task = plot_task_service.create(
+        PlotTask(
+            access_log_id=access_log.access_log_id
+        )
+    )
 
-    # 提取绘图数据源
-    data_source_1 = json_data['data_source_1']
-    data_source_2 = json_data['data_source_2']
+    # 过滤json数据，留下"data_source"，作为绘图任务单数据
+    plot_task_data: dict = get_json_data["data_source"]
 
-    # 判断绘图种类
-    result_access_log = plot_stream.check_plot_type(access_log, data_source_1, data_source_2)
+    # 更新任务单绘图数据并判断绘图种类
+    plot_task.plot_task_data = json.dumps(plot_task_data)
+    result_plot_task = plot_stream.check_plot_type(plot_task)
 
     res_data = {
-        'code': result_access_log.access_plot_flag,
-        'msg': result_access_log.access_plot_type if result_access_log.access_plot_flag == 0 else data_state_dict[result_access_log.access_plot_flag],
-        'data': result_access_log.access_log_id if result_access_log.access_plot_flag == 0 else None
+        'code': result_plot_task.plot_task_support_flag,
+        'msg': (
+            result_plot_task.plot_task_id
+            if result_plot_task.plot_task_support_flag == 0
+            else CONST_PLOT_TASK_SUPPORT_FLAG_DICT[result_plot_task.plot_task_support_flag]
+        ),
+        'data': (
+            json.loads(result_plot_task.plot_task_support_type)
+            if result_plot_task.plot_task_support_flag == 0
+            else None
+        )
     }
 
     return jsonify(res_data)
 
 
-@plot_api.route('/plotting/id', methods=['POST'])
+@plot_api.route('2d/chart/plotting', methods=['POST'])
 def data_source_plot():
     # 接收json数据
     json_data: dict = request.get_json()
 
     # 记录请求
-    access_log_service.create(AccessLog(access_ip=request.remote_addr,
-                                        access_url=request.url,
-                                        access_param=json.dumps(json_data)))
+    access_log_service.create(
+        AccessLog(
+            access_ip=request.remote_addr,
+            access_url=request.url,
+            access_param=json.dumps(json_data)
+        )
+    )
 
     # 校验json数据完整性
-    if not ('plot_key' in json_data.keys() and 'plot_requirement_list' in json_data.keys()):
+    if not ('plot_key' in json_data.keys() and 'plot_requirement' in json_data.keys()):
         res_data = {
             'code': 500,
             'msg': '请求体结构错误',
@@ -95,13 +90,17 @@ def data_source_plot():
         return jsonify(res_data)
 
     # 获取请求数据
-    plotting_access_log_id = json_data['plot_key']
-    plotting_require_list = json_data['plot_requirement_list']
+    plot_task_id = json_data['plot_key']
+    plot_requirement_dict = json_data['plot_requirement']
 
-    # 根据plot_key获取access_log
-    access_log = access_log_service.read_one(access_log=AccessLog(access_log_id=plotting_access_log_id))
+    # 根据plot_key获取plot_task
+    plot_task = plot_task_service.read_one(
+        PlotTask(
+            plot_task_id=plot_task_id
+        )
+    )
 
-    if access_log is None:
+    if plot_task is None:
         res_data = {
             'code': 500,
             'msg': 'plot_key无效',
@@ -110,21 +109,20 @@ def data_source_plot():
         return jsonify(res_data)
 
     # 绘图
-    plot_result = plot_stream.data_source_plot_upload_picture(access_log=access_log,
-                                                              plotting_require_list=plotting_require_list)
+    exec_result: dict | int = plot_stream.plot_and_upload_picture(plot_task, plot_requirement_dict)
 
-    # 判断绘图结果
-    if plot_result is None:
+    # 返回绘图结果
+    if type(exec_result) is dict:
         res_data = {
-            'code': 500,
-            'msg': '请求数据无效',
-            'data': None
+            'code': 200,
+            'msg': '绘图需求校验通过，绘图结果请查看data',
+            'data': exec_result
         }
-        return jsonify(res_data)
     else:
         res_data = {
-            'code': plot_result.plot_result_state,
-            'msg': plot_state_dict[plot_result.plot_result_state],
-            'data': plot_result.plot_result_url if plot_result.plot_result_state == 0 else None
+            'code': exec_result,
+            'msg': CONST_PLOT_REQUIREMENT_ERROR_MSG[exec_result],
+            'data': None
         }
-        return jsonify(res_data)
+
+    return jsonify(res_data)

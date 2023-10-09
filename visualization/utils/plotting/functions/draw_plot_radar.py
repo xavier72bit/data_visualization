@@ -1,21 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# -----------------------------------------------------
-# 定义字体
-# -----------------------------------------------------
-
-font_rc = {
-    'family': 'SimSun',
-    'size': '12'
-}
-
-plt.rc('font', **font_rc)
-
 
 # -----------------------------------------------------
 # 绘图功能函数
 # -----------------------------------------------------
+
 
 def draw_radar(ax: plt.PolarAxes, data_list_x: list, data_list_y: list, **kwargs) -> bool:
     """
@@ -28,8 +18,9 @@ def draw_radar(ax: plt.PolarAxes, data_list_x: list, data_list_y: list, **kwargs
     :return: 绘图操作是否成功
 
     其他的绘图选项：
-        暂无其他绘图选项
+        暂无
     """
+    # 绘图过程
     try:
         # 设置雷达图的角度，用于平分切开一个圆面
         angles = np.linspace(0, 2 * np.pi, len(data_list_x), endpoint=False)
@@ -39,7 +30,7 @@ def draw_radar(ax: plt.PolarAxes, data_list_x: list, data_list_y: list, **kwargs
         angles = np.concatenate((angles, [angles[0]]))
         catalog_list = np.concatenate((data_list_x, [data_list_x[0]]))
 
-        # 绘制图形
+        # 绘图
         ax.plot(angles, values, 'o-', linewidth=2)
 
         # 填充颜色
@@ -50,6 +41,7 @@ def draw_radar(ax: plt.PolarAxes, data_list_x: list, data_list_y: list, **kwargs
 
         # 添加网格线
         ax.grid(True)
+
     except Exception as plot_err:
         print("draw_radar绘图失败，错误原因: {0}".format(plot_err))
         return False

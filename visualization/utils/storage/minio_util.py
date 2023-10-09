@@ -1,10 +1,12 @@
 import json
 import os.path
+import urllib3
+
 from minio import Minio
 from loguru import logger
 
 from visualization.utils import config_util
-from project_common import FILE_CONTENT_TYPE_DICT
+from project_common import CONST_FILE_CONTENT_TYPE_DICT
 
 
 # -----------------------------------------------------
@@ -18,15 +20,32 @@ class MinioUtil:
     minio_client_config = config_util.read_yaml('properties.yaml')['minio']
 
     def __init__(self):
-        # 1. 初始化Minio Client对象
-        self.minio_client = Minio(endpoint=self.minio_client_config["endpoint"],
-                                  access_key=self.minio_client_config["user"],
-                                  secret_key=self.minio_client_config["password"],
-                                  secure=self.minio_client_config["enable_https"])
+        # 初始化Minio Client对象
+        self.minio_client = Minio(
+            endpoint=self.minio_client_config["endpoint"],
+            access_key=self.minio_client_config["user"],
+            secret_key=self.minio_client_config["password"],
+            secure=self.minio_client_config["enable_https"]
+        )
 
-        logger.info('Minio Client初始化成功，配置内容：{0}'.format(self.minio_client_config))
+        logger.info('Minio Client初始化完成，配置内容：{0}'.format(self.minio_client_config))
 
-        # 2. 创建存储桶，配置匿名用户只能读取对象，禁止遍历桶内文件
+        # 检测MinIO Server连通性
+        try:
+            tchc = urllib3.PoolManager(
+                timeout=urllib3.util.Timeout(connect=10, read=10),
+                retries=urllib3.Retry(total=3)
+            )
+            tchc.request('GET', self.minio_client_config["endpoint"])
+        except Exception as tce:
+            logger.critical("MinIO Server无法访问，错误:{0}".format(tce))
+        else:
+            self._create_bucket()
+
+    def _create_bucket(self):
+        """
+        创建存储桶，配置匿名用户只能读取对象，禁止遍历桶内文件
+        """
         is_bucket_exist = self.minio_client.bucket_exists(self.minio_bucket_name)
 
         if is_bucket_exist:
@@ -49,15 +68,14 @@ class MinioUtil:
             except Exception as err:
                 logger.error("存储桶权限修改失败，错误原因：{0}".format(err))
             else:
-                logger.info("修改存储桶权限成功，权限：{0}"
-                            .format(self.minio_client.get_bucket_policy(self.minio_bucket_name)))
+                logger.info("修改存储桶权限成功，权限：{0}".format(self.minio_client.get_bucket_policy(self.minio_bucket_name)))
 
     def upload_file(self, file_path: str) -> str | None:
         """
         上传文件到minio，返回文件URL
         """
         object_name = os.path.split(file_path)[-1]
-        object_content_type = FILE_CONTENT_TYPE_DICT[os.path.split(file_path)[-1].split(".")[-1]]
+        object_content_type = CONST_FILE_CONTENT_TYPE_DICT[os.path.split(file_path)[-1].split(".")[-1]]
 
         try:
             with open(file_path, 'rb') as data:

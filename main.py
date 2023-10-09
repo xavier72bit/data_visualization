@@ -29,10 +29,10 @@ property_config_dict = config_util.read_yaml("properties.yaml")
 app_config_dict = property_config_dict['app']
 app_server_config_dict = property_config_dict['app_server']
 
-
 # -----------------------------------------------------
 # 初始化Flask app
 # -----------------------------------------------------
+
 
 class NoAsciiJSONProvider(DefaultJSONProvider):
     """

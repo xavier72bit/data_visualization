@@ -56,18 +56,13 @@ class MysqlUtil:
         """
         try:
             self._mysql_connection = self._connection_pool.get_connection()
-        except Exception as get_connection_err:
-            logger.error("获取MySQL连接失败，错误原因: {0}".format(get_connection_err))
-        else:
-            logger.info("获取MySQL连接成功")
+        except Exception as gcoe:
+            logger.error("获取MySQL连接失败，错误原因: {0}".format(gcoe))
 
-        logger.info("获取MySQL操作光标")
         try:
             self._cursor = self._mysql_connection.cursor(DictCursor)
-        except Exception as get_cursor_err:
-            logger.error("MySQL光标获取失败，错误原因: {0}".format(get_cursor_err))
-        else:
-            logger.info("MySQL光标获取成功")
+        except Exception as gcue:
+            logger.error("MySQL光标获取失败，错误原因: {0}".format(gcue))
 
         return self
 
@@ -75,17 +70,14 @@ class MysqlUtil:
         """
         退出环境管理器时，自动关闭mysql连接与光标
         """
-        logger.info("关闭MySQL光标: {0}".format(self._cursor))
         self._cursor.close()
-
-        logger.info("关闭MySQL连接: {0}".format(self._mysql_connection))
         self._mysql_connection.close()
 
     def insert(self, sql, args):
         try:
             result = self._cursor.execute(sql, args)
-        except Exception as insert_err:
-            logger.error("单条INSERT操作执行失败，错误原因: {0}".format(insert_err))
+        except Exception as ie:
+            logger.error("单条INSERT操作执行失败，错误原因: {0}".format(ie))
             result = 0
         else:
             logger.info("单条INSERT操作已执行，受影响行数: {0}".format(result))
@@ -95,8 +87,8 @@ class MysqlUtil:
     def delete(self, sql, args):
         try:
             result = self._cursor.execute(sql, args)
-        except Exception as delete_err:
-            logger.error("DELETE操作执行失败，错误原因: {0}".format(delete_err))
+        except Exception as de:
+            logger.error("DELETE操作执行失败，错误原因: {0}".format(de))
             result = 0
         else:
             logger.info("DELETE操作已执行，受影响行数: {0}".format(result))
@@ -106,8 +98,8 @@ class MysqlUtil:
     def update(self, sql, args):
         try:
             result = self._cursor.execute(sql, args)
-        except Exception as update_err:
-            logger.error("UPDATE操作执行失败，错误原因: {0}".format(update_err))
+        except Exception as ue:
+            logger.error("UPDATE操作执行失败，错误原因: {0}".format(ue))
             result = 0
         else:
             logger.info("UPDATE操作已执行，受影响行数: {0}".format(result))
@@ -117,8 +109,8 @@ class MysqlUtil:
     def select_one(self, sql, args) -> dict | None:
         try:
             result = self._cursor.execute(sql, args)
-        except Exception as select_one_err:
-            logger.error("SELECT操作执行失败，错误原因: {0}".format(select_one_err))
+        except Exception as soe:
+            logger.error("SELECT操作执行失败，错误原因: {0}".format(soe))
             result = 0
         else:
             logger.info("SELECT操作已执行，查询到: {0}行".format(result))
@@ -126,8 +118,8 @@ class MysqlUtil:
         if result:
             try:
                 select_result_dict = self._cursor.fetchone()
-            except Exception as fetch_result_err:
-                logger.error("获取查询结果失败! 错误原因: {0}".format(fetch_result_err))
+            except Exception as foe:
+                logger.error("获取查询结果失败! 错误原因: {0}".format(foe))
 
                 return None
             else:
@@ -140,8 +132,8 @@ class MysqlUtil:
     def select_list(self, sql, args) -> list[dict] | None:
         try:
             result = self._cursor.execute(sql, args)
-        except Exception as select_one_err:
-            logger.error("SELECT操作执行失败，错误原因: {0}".format(select_one_err))
+        except Exception as sle:
+            logger.error("SELECT操作执行失败，错误原因: {0}".format(sle))
             result = 0
         else:
             logger.info("SELECT操作已执行，查询到: {0}行".format(result))
@@ -149,8 +141,8 @@ class MysqlUtil:
         if result:
             try:
                 select_result_list = self._cursor.fetchall()
-            except Exception as fetch_list_err:
-                logger.error("获取查询结果失败! 错误原因: {0}".format(fetch_list_err))
+            except Exception as fle:
+                logger.error("获取查询结果失败! 错误原因: {0}".format(fle))
 
                 return None
             else:

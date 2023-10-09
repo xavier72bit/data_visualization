@@ -1,8 +1,8 @@
 import datetime
 import matplotlib.pyplot as plt
 
-from data_visualization.utils.plotting import plotting_util
-from data_visualization.utils.plotting.plotting_functions import draw_plot_column, draw_plot_line, draw_plot_pie, draw_plot_bar, draw_plot_radar
+from visualization.utils.plotting import plotting_util
+from visualization.utils.plotting.plotting_functions import draw_plot_column, draw_plot_line, draw_plot_pie, draw_plot_bar, draw_plot_radar
 
 
 # -----------------------------------------------------

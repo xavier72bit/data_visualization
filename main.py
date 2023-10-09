@@ -5,9 +5,9 @@ from werkzeug.utils import cached_property
 from flask.json.provider import DefaultJSONProvider
 
 from project_common import CURRENT_LOG_PATH
-from data_visualization.api import plot_api
-from data_visualization.api import sysinfo_api
-from data_visualization.utils import config_util
+from visualization.api import plot_api
+from visualization.api import sysinfo_api
+from visualization.utils import config_util
 
 # -----------------------------------------------------
 # 初始化项目日志

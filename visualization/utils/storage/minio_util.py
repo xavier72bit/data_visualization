@@ -3,7 +3,7 @@ import os.path
 from minio import Minio
 from loguru import logger
 
-from data_visualization.utils import config_util
+from visualization.utils import config_util
 from project_common import FILE_CONTENT_TYPE_DICT
 
 

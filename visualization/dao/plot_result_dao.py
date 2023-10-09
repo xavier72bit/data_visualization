@@ -1,5 +1,5 @@
-from data_visualization.utils.do.data_object import PlotResult
-from data_visualization.utils.db.pymysql_util import MysqlUtil
+from visualization.utils.do.data_object import PlotResult
+from visualization.utils.db.pymysql_util import MysqlUtil
 
 
 def insert(plot_result: PlotResult) -> int:

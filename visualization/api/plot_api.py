@@ -1,9 +1,9 @@
 import json
 from flask import Blueprint, request, jsonify
 
-from data_visualization.stream import plot_stream
-from data_visualization.service import access_log_service
-from data_visualization.utils.do.data_object import AccessLog
+from visualization.stream import plot_stream
+from visualization.service import access_log_service
+from visualization.utils.do.data_object import AccessLog
 
 # -----------------------------------------------------
 # 定义flask蓝图

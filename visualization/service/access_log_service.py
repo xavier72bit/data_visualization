@@ -1,7 +1,7 @@
 from project_common import DATE_TIME_NOW
-from data_visualization.dao import access_log_dao
-from data_visualization.utils.do.data_object import AccessLog
-from data_visualization.utils.do.data_object_util import general_primary_key
+from visualization.dao import access_log_dao
+from visualization.utils.do.data_object import AccessLog
+from visualization.utils.do.data_object_util import general_primary_key
 
 
 def create(access_log: AccessLog) -> AccessLog | None:

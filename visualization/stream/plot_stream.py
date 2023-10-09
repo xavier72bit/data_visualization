@@ -1,11 +1,11 @@
 import json
 from loguru import logger
 
-from data_visualization.utils.plotting import plotting_engine
+from visualization.utils.plotting import plotting_engine
 from project_common import PLOT_INDEX_TYPE_DICT, DATE_TIME_NOW
-from data_visualization.utils.storage.minio_util import MinioUtil
-from data_visualization.utils.do.data_object import AccessLog, PlotResult
-from data_visualization.service import access_log_service, plot_result_service
+from visualization.utils.storage.minio_util import MinioUtil
+from visualization.utils.do.data_object import AccessLog, PlotResult
+from visualization.service import access_log_service, plot_result_service
 
 
 # -----------------------------------------------------

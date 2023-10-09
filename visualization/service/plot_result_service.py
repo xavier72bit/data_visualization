@@ -1,7 +1,7 @@
-from data_visualization.dao import plot_result_dao
+from visualization.dao import plot_result_dao
 
-from data_visualization.utils.do.data_object import PlotResult
-from data_visualization.utils.do.data_object_util import general_primary_key
+from visualization.utils.do.data_object import PlotResult
+from visualization.utils.do.data_object_util import general_primary_key
 
 
 def create(plot_result: PlotResult) -> PlotResult | None:

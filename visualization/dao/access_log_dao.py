@@ -1,5 +1,5 @@
-from data_visualization.utils.do.data_object import AccessLog
-from data_visualization.utils.db.pymysql_util import MysqlUtil
+from visualization.utils.do.data_object import AccessLog
+from visualization.utils.db.pymysql_util import MysqlUtil
 
 
 def insert(access_log: AccessLog) -> int:

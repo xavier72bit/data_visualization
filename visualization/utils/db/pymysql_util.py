@@ -3,7 +3,7 @@ from loguru import logger
 from pymysql.cursors import DictCursor
 from dbutils.pooled_db import PooledDB
 
-from data_visualization.utils import config_util
+from visualization.utils import config_util
 
 
 class MysqlConnectionPool:
